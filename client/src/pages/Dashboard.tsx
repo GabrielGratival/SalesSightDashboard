@@ -5,7 +5,7 @@ import { CityList } from "@/components/dashboard/CityList";
 import { StatusPipeline } from "@/components/dashboard/StatusPipeline";
 import { Timeline } from "@/components/dashboard/Timeline";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Building2, Calendar, User, MapPin, ArrowLeft } from "lucide-react";
+import { Building2, Calendar, User, MapPin, ArrowLeft, PanelLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -15,6 +15,7 @@ export default function Dashboard() {
   const [cities, setCities] = React.useState<City[]>(mockCities);
   const [selectedCityId, setSelectedCityId] = React.useState<string | null>(cities[0]?.id || null);
   const [isMobileListView, setIsMobileListView] = React.useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = React.useState(true);
   const currentUser = mockSalesReps[0]; // Mock logged in user
 
   const selectedCity = React.useMemo(
@@ -29,6 +30,10 @@ export default function Dashboard() {
 
   const handleBackToList = () => {
     setIsMobileListView(true);
+  };
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
   };
 
   const handleStatusChange = (newStatus: CRMStatus) => {
@@ -63,35 +68,47 @@ export default function Dashboard() {
   return (
     <div className="h-screen w-full flex flex-col bg-background overflow-hidden">
       {/* Header */}
-      <header className="h-16 border-b border-border flex items-center justify-between px-4 md:px-6 bg-card shrink-0 z-10">
-        <div className="flex items-center gap-2">
-          {/* Mobile Back Button (only visible when in detail view on mobile) */}
+      <header className="h-14 border-b border-border flex items-center justify-between px-4 bg-card shrink-0 z-10">
+        <div className="flex items-center gap-3">
+          {/* Mobile Back Button */}
           {!isMobileListView && (
             <Button 
               variant="ghost" 
               size="icon" 
-              className="md:hidden -ml-2 mr-1" 
+              className="md:hidden -ml-2" 
               onClick={handleBackToList}
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
           )}
 
-          <div className="bg-primary/10 p-2 rounded-lg">
-            <Building2 className="h-5 w-5 text-primary" />
-          </div>
-          <div>
-            <h1 className="font-heading font-bold text-lg leading-none text-foreground">GovCRM</h1>
-            <p className="text-[10px] text-muted-foreground font-mono uppercase tracking-widest hidden sm:block">Dashboard Comercial</p>
+          {/* Desktop Sidebar Toggle */}
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="hidden md:flex -ml-2 text-muted-foreground hover:text-primary" 
+            onClick={toggleSidebar}
+          >
+            <PanelLeft className="h-5 w-5" />
+          </Button>
+
+          <div className="flex items-center gap-2">
+            <div className="bg-primary/10 p-1.5 rounded-lg">
+              <Building2 className="h-4 w-4 text-primary" />
+            </div>
+            <div>
+              <h1 className="font-heading font-bold text-base leading-none text-foreground">GovCRM</h1>
+              <p className="text-[10px] text-muted-foreground font-mono uppercase tracking-widest hidden sm:block">Dashboard Comercial</p>
+            </div>
           </div>
         </div>
         
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <div className="text-right hidden md:block">
-            <p className="text-sm font-medium">{currentUser.name}</p>
-            <p className="text-xs text-muted-foreground">Representante Comercial</p>
+            <p className="text-xs font-medium">{currentUser.name}</p>
+            <p className="text-[10px] text-muted-foreground">Representante</p>
           </div>
-          <Avatar className="h-9 w-9 ring-2 ring-background shadow-sm">
+          <Avatar className="h-8 w-8 ring-2 ring-background shadow-sm">
             <AvatarImage src={currentUser.avatar} />
             <AvatarFallback>CS</AvatarFallback>
           </Avatar>
@@ -102,14 +119,17 @@ export default function Dashboard() {
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar - City List */}
         <aside className={cn(
-          "w-full md:w-[350px] shrink-0 h-full transition-all duration-300 ease-in-out",
-          isMobileListView ? "block" : "hidden md:block"
+          "shrink-0 h-full transition-all duration-300 ease-in-out border-r border-border bg-card overflow-hidden",
+          isMobileListView ? "w-full block" : "hidden md:block",
+          !isSidebarOpen && !isMobileListView ? "w-0 border-r-0" : "md:w-[320px]"
         )}>
-          <CityList 
-            cities={cities} 
-            selectedCityId={selectedCityId} 
-            onSelectCity={handleSelectCity} 
-          />
+          <div className="w-full h-full min-w-[320px]">
+             <CityList 
+               cities={cities} 
+               selectedCityId={selectedCityId} 
+               onSelectCity={handleSelectCity} 
+             />
+          </div>
         </aside>
 
         {/* Main Workspace */}
@@ -119,44 +139,48 @@ export default function Dashboard() {
         )}>
           {selectedCity ? (
             <>
-              {/* City Header & Context */}
-              <div className="p-4 md:p-6 pb-2 bg-card border-b border-border shadow-sm z-10">
-                <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 mb-6">
-                  <div>
-                    <h2 className="text-2xl md:text-3xl font-heading font-bold text-foreground mb-1 tracking-tight">
-                      {selectedCity.name}
-                    </h2>
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground">
-                      <span className="flex items-center gap-1.5">
-                        <MapPin className="w-4 h-4" /> {selectedCity.state}
+              {/* City Header & Context - Compact Version */}
+              <div className="bg-card border-b border-border shadow-sm z-10 px-4 py-3 md:px-6">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-baseline gap-3 mb-1">
+                      <h2 className="text-xl md:text-2xl font-heading font-bold text-foreground tracking-tight truncate">
+                        {selectedCity.name}
+                      </h2>
+                      <div className="hidden md:flex items-center gap-2 text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1">
+                          <MapPin className="w-3 h-3" /> {selectedCity.state}
+                        </span>
+                        <span className="w-1 h-1 rounded-full bg-border" />
+                        <span className="flex items-center gap-1">
+                          <User className="w-3 h-3" /> {(selectedCity.population / 1000).toFixed(1)}k
+                        </span>
+                      </div>
+                    </div>
+                    
+                    {/* Mobile only sub-info */}
+                    <div className="flex md:hidden items-center gap-3 text-xs text-muted-foreground mb-2">
+                      <span className="flex items-center gap-1">
+                        <MapPin className="w-3 h-3" /> {selectedCity.state}
                       </span>
-                      <span className="hidden md:inline w-1 h-1 rounded-full bg-border" />
-                      <span className="flex items-center gap-1.5">
-                        <User className="w-4 h-4" /> {(selectedCity.population / 1000).toFixed(1)}k
+                      <span className="flex items-center gap-1">
+                         <User className="w-3 h-3" /> {(selectedCity.population / 1000).toFixed(1)}k
                       </span>
-                      {selectedCity.lastVisit && (
-                        <>
-                          <span className="hidden md:inline w-1 h-1 rounded-full bg-border" />
-                          <span className="flex items-center gap-1.5 text-orange-600/80">
-                            <Calendar className="w-4 h-4" /> {format(selectedCity.lastVisit, "d MMM", { locale: ptBR })}
-                          </span>
-                        </>
-                      )}
                     </div>
                   </div>
                   
-                  <div className="bg-secondary/50 px-4 py-2 rounded-lg border border-border/50 self-start w-full md:w-auto">
-                     <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider block mb-1">
-                       Próxima Ação
+                  <div className="flex items-center gap-3 self-start md:self-center w-full md:w-auto bg-secondary/30 px-3 py-1.5 rounded-md border border-border/50">
+                     <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider whitespace-nowrap">
+                       Próxima Ação:
                      </span>
-                     <span className="font-medium text-foreground">
-                       {selectedCity.nextAction || "Nenhuma ação agendada"}
+                     <span className="text-sm font-medium text-foreground truncate max-w-[200px]">
+                       {selectedCity.nextAction || "Nenhuma"}
                      </span>
                   </div>
                 </div>
 
                 {/* Pipeline Visualizer */}
-                <div className="mt-4">
+                <div className="w-full">
                   <StatusPipeline 
                     currentStatus={selectedCity.currentStatus} 
                     onStatusChange={handleStatusChange}
@@ -165,7 +189,7 @@ export default function Dashboard() {
               </div>
 
               {/* Timeline & Interactions */}
-              <div className="flex-1 overflow-hidden">
+              <div className="flex-1 overflow-hidden bg-secondary/5">
                 <Timeline 
                   interactions={selectedCity.interactions}
                   onAddInteraction={handleAddInteraction}
