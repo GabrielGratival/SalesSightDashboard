@@ -41,31 +41,28 @@ export function Timeline({ interactions, onAddInteraction }: TimelineProps) {
 
   return (
     <div className="flex flex-col h-full bg-secondary/10">
-      <div className="p-4 border-b border-border bg-card">
-        <h3 className="font-heading font-medium text-lg">Histórico de Interações</h3>
+      <div className="px-4 py-2 border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
+        <h3 className="font-heading font-medium text-xs text-muted-foreground uppercase tracking-wider">Histórico de Interações</h3>
       </div>
 
-      <ScrollArea className="flex-1 p-4">
+      <ScrollArea className="flex-1 p-3">
         <div className="space-y-3 max-w-3xl mx-auto pb-4">
           {interactions.map((interaction) => (
             <div key={interaction.id} className="flex gap-3 group">
-              <div className="flex flex-col items-center gap-1">
+              <div className="flex flex-col items-center gap-1 pt-1">
                 <div className={cn(
-                  "w-8 h-8 rounded-full flex items-center justify-center shadow-sm shrink-0 border",
+                  "w-6 h-6 rounded-full flex items-center justify-center shadow-sm shrink-0 border",
                   getIconStyles(interaction.type)
                 )}>
                   {getIcon(interaction.type)}
                 </div>
-                <div className="w-0.5 flex-1 bg-border group-last:hidden" />
+                <div className="w-px flex-1 bg-border group-last:hidden" />
               </div>
               
-              <div className="flex-1 pt-0.5 pb-3">
+              <div className="flex-1 pb-2">
                 <div className="flex items-baseline justify-between mb-1">
                   <div className="flex items-center gap-2">
-                    <span className="font-medium text-sm text-foreground">{interaction.author}</span>
-                    <span className="text-[10px] text-muted-foreground bg-secondary px-1.5 py-0 rounded-md capitalize">
-                      {getInteractionTypeLabel(interaction.type)}
-                    </span>
+                    <span className="font-medium text-xs text-foreground">{interaction.author}</span>
                   </div>
                   <span className="text-[10px] text-muted-foreground font-mono capitalize">
                     {format(interaction.createdAt, "d MMM, HH:mm", { locale: ptBR })}
@@ -73,13 +70,13 @@ export function Timeline({ interactions, onAddInteraction }: TimelineProps) {
                 </div>
 
                 <div className={cn(
-                  "bg-card rounded-xl rounded-tl-none border border-border shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden",
-                  interaction.type === "image" ? "p-0" : "p-3"
+                  "bg-card rounded-lg rounded-tl-none border border-border shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden",
+                  interaction.type === "image" ? "p-0" : "p-2.5"
                 )}>
                   {interaction.type === "audio" ? (
                     <AudioPlayer duration={interaction.duration} />
                   ) : interaction.type === "image" ? (
-                    <div className="relative aspect-video w-full max-w-[240px] bg-muted">
+                    <div className="relative aspect-video w-full max-w-[200px] bg-muted">
                       <img 
                         src={interaction.content} 
                         alt="Anexo da interação" 
@@ -98,46 +95,46 @@ export function Timeline({ interactions, onAddInteraction }: TimelineProps) {
         </div>
       </ScrollArea>
 
-      <div className="p-4 bg-card border-t border-border">
+      <div className="p-3 bg-card border-t border-border">
         <div className="max-w-3xl mx-auto">
-          <div className="relative bg-secondary/30 rounded-xl p-2 border border-input focus-within:border-primary/50 focus-within:bg-background transition-all">
+          <div className="relative bg-secondary/30 rounded-xl p-1.5 border border-input focus-within:border-primary/50 focus-within:bg-background transition-all">
             <Textarea 
               value={newNote}
               onChange={(e) => setNewNote(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Digite uma nota sobre esta cidade..."
-              className="min-h-[60px] border-0 bg-transparent resize-none focus-visible:ring-0 p-2 text-sm"
+              placeholder="Digite uma nota..."
+              className="min-h-[40px] border-0 bg-transparent resize-none focus-visible:ring-0 p-2 text-sm"
               data-testid="input-new-note"
             />
-            <div className="flex justify-between items-center px-2 pb-1 mt-2">
-              <div className="flex gap-2">
+            <div className="flex justify-between items-center px-1 pb-0.5 mt-1">
+              <div className="flex gap-1">
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-full"
+                  className="h-7 w-7 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-full"
                   onClick={() => onAddInteraction("audio", "Nota de voz gravada")}
                   data-testid="btn-record-audio"
                 >
-                  <Mic className="w-4 h-4" />
+                  <Mic className="w-3.5 h-3.5" />
                 </Button>
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-full"
+                  className="h-7 w-7 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-full"
                   onClick={() => setIsCameraOpen(true)}
                   data-testid="btn-open-camera"
                 >
-                  <Camera className="w-4 h-4" />
+                  <Camera className="w-3.5 h-3.5" />
                 </Button>
               </div>
               <Button 
                 size="sm" 
                 onClick={handleSend} 
                 disabled={!newNote.trim()}
-                className="rounded-full px-4"
+                className="rounded-full px-3 h-7 text-xs"
                 data-testid="btn-send-note"
               >
-                Adicionar <Send className="w-3 h-3 ml-2" />
+                Enviar <Send className="w-3 h-3 ml-1.5" />
               </Button>
             </div>
           </div>
@@ -201,11 +198,11 @@ function getInteractionTypeLabel(type: Interaction["type"]) {
 
 function getIcon(type: Interaction["type"]) {
   switch (type) {
-    case "audio": return <Mic className="w-4 h-4" />;
-    case "note": return <FileText className="w-4 h-4" />;
-    case "visit": return <MapPin className="w-4 h-4" />;
-    case "cta": return <Flag className="w-4 h-4" />;
-    case "image": return <ImageIcon className="w-4 h-4" />;
+    case "audio": return <Mic className="w-3.5 h-3.5" />;
+    case "note": return <FileText className="w-3.5 h-3.5" />;
+    case "visit": return <MapPin className="w-3.5 h-3.5" />;
+    case "cta": return <Flag className="w-3.5 h-3.5" />;
+    case "image": return <ImageIcon className="w-3.5 h-3.5" />;
   }
 }
 
@@ -223,14 +220,14 @@ function AudioPlayer({ duration }: { duration?: string }) {
   const [playing, setPlaying] = React.useState(false);
 
   return (
-    <div className="flex items-center gap-3 min-w-[200px]">
+    <div className="flex items-center gap-3 min-w-[180px]">
       <Button
         variant="outline"
         size="icon"
-        className="h-8 w-8 rounded-full shrink-0 text-primary hover:text-primary hover:bg-primary/10"
+        className="h-7 w-7 rounded-full shrink-0 text-primary hover:text-primary hover:bg-primary/10"
         onClick={() => setPlaying(!playing)}
       >
-        {playing ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
+        {playing ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3 ml-0.5" />}
       </Button>
       <div className="flex-1 h-1 bg-secondary rounded-full overflow-hidden">
         <div 
@@ -238,7 +235,7 @@ function AudioPlayer({ duration }: { duration?: string }) {
           style={{ width: playing ? "60%" : "0%" }}
         />
       </div>
-      <span className="text-xs font-mono text-muted-foreground">{duration || "0:00"}</span>
+      <span className="text-[10px] font-mono text-muted-foreground">{duration || "0:00"}</span>
     </div>
   );
 }
