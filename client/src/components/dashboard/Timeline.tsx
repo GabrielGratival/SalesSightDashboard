@@ -228,9 +228,16 @@ function getIconStyles(type: Interaction["type"]) {
 
 function AudioPlayer({ duration }: { duration?: string }) {
   const [playing, setPlaying] = React.useState(false);
+  const [speed, setSpeed] = React.useState<1 | 1.5 | 2>(1);
+
+  const toggleSpeed = () => {
+    if (speed === 1) setSpeed(1.5);
+    else if (speed === 1.5) setSpeed(2);
+    else setSpeed(1);
+  };
 
   return (
-    <div className="flex items-center gap-3 min-w-[180px]">
+    <div className="flex items-center gap-2 min-w-[180px]">
       <Button
         variant="outline"
         size="icon"
@@ -239,13 +246,25 @@ function AudioPlayer({ duration }: { duration?: string }) {
       >
         {playing ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3 ml-0.5" />}
       </Button>
-      <div className="flex-1 h-1 bg-secondary rounded-full overflow-hidden">
+      
+      <div className="flex-1 h-1 bg-secondary rounded-full overflow-hidden mx-1">
         <div 
-          className="h-full bg-primary/80 rounded-full transition-all duration-1000 ease-linear"
-          style={{ width: playing ? "60%" : "0%" }}
+          className="h-full bg-primary/80 rounded-full transition-all ease-linear"
+          style={{ 
+            width: playing ? "60%" : "0%",
+            transitionDuration: playing ? `${(1000 / speed)}ms` : '0ms' 
+          }}
         />
       </div>
-      <span className="text-[10px] font-mono text-muted-foreground">{duration || "0:00"}</span>
+      
+      <span className="text-[10px] font-mono text-muted-foreground w-8 text-right">{duration || "0:00"}</span>
+      
+      <button 
+        onClick={toggleSpeed}
+        className="text-[9px] font-bold text-primary/80 hover:text-primary bg-primary/5 hover:bg-primary/10 px-1.5 py-0.5 rounded-md min-w-[28px] transition-colors"
+      >
+        {speed}x
+      </button>
     </div>
   );
 }
