@@ -24,8 +24,8 @@ export function StatusPipeline({ currentStatus, onStatusChange }: StatusPipeline
   };
 
   return (
-    <div className="w-full overflow-x-auto pb-2 pt-1 scrollbar-thin scrollbar-thumb-border">
-      <div className="flex items-center justify-between min-w-[500px] gap-1">
+    <div className="w-full overflow-hidden pb-2 pt-1">
+      <div className="flex items-center justify-between w-full gap-0.5 md:gap-1">
         {CRM_STATUSES.map((status, index) => {
           const isCompleted = index < currentIndex;
           const isCurrent = index === currentIndex;
@@ -35,23 +35,23 @@ export function StatusPipeline({ currentStatus, onStatusChange }: StatusPipeline
               <button
                 onClick={() => onStatusChange(status)}
                 className={cn(
-                  "group relative flex flex-col items-center gap-1.5 flex-1 min-w-[60px] transition-all duration-300 focus:outline-none",
+                  "group relative flex flex-col items-center gap-1.5 flex-1 min-w-0 transition-all duration-300 focus:outline-none",
                   isCurrent ? "scale-100" : "hover:scale-105 opacity-80 hover:opacity-100"
                 )}
                 data-testid={`status-step-${status}`}
               >
                 <div 
                   className={cn(
-                    "w-7 h-7 rounded-full flex items-center justify-center shadow-sm transition-colors duration-300 border",
+                    "w-6 h-6 md:w-7 md:h-7 rounded-full flex items-center justify-center shadow-sm transition-colors duration-300 border shrink-0",
                     isCompleted ? "bg-primary border-primary text-primary-foreground" : 
                     isCurrent ? getStatusColor(status) + " border-current ring-2 ring-offset-1 ring-offset-background ring-primary/20" : 
                     "bg-muted border-muted-foreground/20 text-muted-foreground"
                   )}
                 >
-                  {isCompleted ? <Check className="w-3.5 h-3.5" /> : <span className="text-[10px] font-medium">{index + 1}</span>}
+                  {isCompleted ? <Check className="w-3 h-3 md:w-3.5 md:h-3.5" /> : <span className="text-[10px] font-medium">{index + 1}</span>}
                 </div>
                 <span className={cn(
-                  "text-[10px] font-medium text-center transition-colors leading-none",
+                  "text-[9px] md:text-[10px] font-medium text-center transition-colors leading-none truncate w-full px-0.5",
                   isCurrent ? "text-foreground font-bold" : "text-muted-foreground"
                 )}>
                   {status}
@@ -65,7 +65,7 @@ export function StatusPipeline({ currentStatus, onStatusChange }: StatusPipeline
               
               {index < CRM_STATUSES.length - 1 && (
                 <div className={cn(
-                  "h-0.5 flex-1 transition-colors duration-500 mx-1",
+                  "h-0.5 flex-1 transition-colors duration-500 mx-0.5 md:mx-1 shrink",
                   index < currentIndex ? "bg-primary" : "bg-muted"
                 )} />
               )}
