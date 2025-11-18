@@ -79,7 +79,7 @@ export function Timeline({ interactions, onAddInteraction }: TimelineProps) {
                 </div>
 
                 <div className={cn(
-                  "bg-card rounded-lg rounded-tl-none border border-border shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden",
+                  "bg-card rounded-lg rounded-tl-none border border-border shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden w-fit",
                   interaction.type === "image" ? "p-0" : "p-2.5"
                 )}>
                   {interaction.type === "audio" ? (
