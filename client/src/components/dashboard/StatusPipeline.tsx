@@ -62,12 +62,8 @@ export function StatusPipeline({ currentStatus, onStatusChange }: StatusPipeline
                   <div className="absolute -bottom-1.5 w-full h-0.5 bg-primary/50 rounded-full animate-in fade-in zoom-in duration-300" />
                 )}
               </button>
-              
               {index < CRM_STATUSES.length - 1 && (
-                <div className={cn(
-                  "h-0.5 flex-1 transition-colors duration-500 mx-0.5 md:mx-1 shrink",
-                  index < currentIndex ? "bg-primary" : "bg-muted"
-                )} />
+                <div className="h-0.5 flex-1 transition-colors duration-500 mx-0.5 md:mx-1 shrink bg-primary ml-[0px] mr-[0px]" />
               )}
             </React.Fragment>
           );
