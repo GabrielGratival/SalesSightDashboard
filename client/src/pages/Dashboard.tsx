@@ -28,7 +28,7 @@ export default function Dashboard() {
     ));
   };
 
-  const handleAddInteraction = (type: "audio" | "note", content: string) => {
+  const handleAddInteraction = (type: "audio" | "note" | "image", content: string) => {
     if (!selectedCityId) return;
 
     const newInteraction: Interaction = {

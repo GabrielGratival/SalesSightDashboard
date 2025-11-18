@@ -2,21 +2,22 @@ import * as React from "react";
 import { Interaction } from "@/lib/mockData";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { Mic, FileText, MapPin, Send, Flag, Play, Pause } from "lucide-react";
+import { Mic, FileText, MapPin, Send, Flag, Play, Pause, Camera, Image as ImageIcon, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface TimelineProps {
   interactions: Interaction[];
-  onAddInteraction: (type: "audio" | "note", content: string) => void;
+  onAddInteraction: (type: "audio" | "note" | "image", content: string) => void;
 }
 
 export function Timeline({ interactions, onAddInteraction }: TimelineProps) {
   const [newNote, setNewNote] = React.useState("");
-  const scrollRef = React.useRef<HTMLDivElement>(null);
-
+  const [isCameraOpen, setIsCameraOpen] = React.useState(false);
+  
   const handleSend = () => {
     if (!newNote.trim()) return;
     onAddInteraction("note", newNote);
@@ -28,6 +29,13 @@ export function Timeline({ interactions, onAddInteraction }: TimelineProps) {
       e.preventDefault();
       handleSend();
     }
+  };
+
+  const handleCapture = () => {
+    // Simulate capturing an image
+    const randomImage = `https://picsum.photos/seed/${Date.now()}/800/600`;
+    onAddInteraction("image", randomImage);
+    setIsCameraOpen(false);
   };
 
   return (
@@ -63,9 +71,20 @@ export function Timeline({ interactions, onAddInteraction }: TimelineProps) {
                   </span>
                 </div>
 
-                <div className="bg-card p-4 rounded-2xl rounded-tl-none border border-border shadow-sm hover:shadow-md transition-shadow duration-200">
+                <div className={cn(
+                  "bg-card rounded-2xl rounded-tl-none border border-border shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden",
+                  interaction.type === "image" ? "p-0" : "p-4"
+                )}>
                   {interaction.type === "audio" ? (
                     <AudioPlayer duration={interaction.duration} />
+                  ) : interaction.type === "image" ? (
+                    <div className="relative aspect-video w-full bg-muted">
+                      <img 
+                        src={interaction.content} 
+                        alt="Interaction attachment" 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
                   ) : (
                     <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap">
                       {interaction.content}
@@ -104,9 +123,10 @@ export function Timeline({ interactions, onAddInteraction }: TimelineProps) {
                   variant="ghost" 
                   size="icon" 
                   className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-full"
-                  onClick={() => {}}
+                  onClick={() => setIsCameraOpen(true)}
+                  data-testid="btn-open-camera"
                 >
-                  <MapPin className="w-4 h-4" />
+                  <Camera className="w-4 h-4" />
                 </Button>
               </div>
               <Button 
@@ -122,6 +142,47 @@ export function Timeline({ interactions, onAddInteraction }: TimelineProps) {
           </div>
         </div>
       </div>
+
+      {/* Camera Modal */}
+      <Dialog open={isCameraOpen} onOpenChange={setIsCameraOpen}>
+        <DialogContent className="sm:max-w-md p-0 overflow-hidden gap-0 bg-black border-zinc-800">
+          <div className="relative aspect-[4/3] bg-zinc-900 flex items-center justify-center overflow-hidden">
+            {/* Camera Viewfinder UI */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="text-zinc-500 flex flex-col items-center gap-2">
+                <Camera className="w-12 h-12 opacity-20" />
+                <span className="text-xs font-mono uppercase tracking-widest opacity-40">Camera View</span>
+              </div>
+            </div>
+            
+            {/* Grid Overlay */}
+            <div className="absolute inset-0 grid grid-cols-3 grid-rows-3 pointer-events-none opacity-20">
+              {[...Array(9)].map((_, i) => (
+                <div key={i} className="border border-white/30" />
+              ))}
+            </div>
+
+            {/* Interface Overlay */}
+            <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent flex justify-center items-end pb-8">
+              <Button 
+                size="lg" 
+                className="h-16 w-16 rounded-full border-4 border-white bg-transparent hover:bg-white/20 p-1 group relative"
+                onClick={handleCapture}
+                data-testid="btn-capture-image"
+              >
+                <span className="absolute inset-1.5 rounded-full bg-white group-active:scale-90 transition-transform duration-100" />
+              </Button>
+            </div>
+            
+            <button 
+              onClick={() => setIsCameraOpen(false)}
+              className="absolute top-4 right-4 p-2 text-white/70 hover:text-white bg-black/20 rounded-full backdrop-blur-sm"
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -132,6 +193,7 @@ function getIcon(type: Interaction["type"]) {
     case "note": return <FileText className="w-5 h-5" />;
     case "visit": return <MapPin className="w-5 h-5" />;
     case "cta": return <Flag className="w-5 h-5" />;
+    case "image": return <ImageIcon className="w-5 h-5" />;
   }
 }
 
@@ -141,6 +203,7 @@ function getIconStyles(type: Interaction["type"]) {
     case "note": return "bg-slate-100 text-slate-600 border-slate-200";
     case "visit": return "bg-orange-100 text-orange-600 border-orange-200";
     case "cta": return "bg-red-100 text-red-600 border-red-200";
+    case "image": return "bg-pink-100 text-pink-600 border-pink-200";
   }
 }
 

@@ -19,8 +19,8 @@ export const CRM_STATUSES: CRMStatus[] = [
 
 export interface Interaction {
   id: string;
-  type: "audio" | "note" | "visit" | "cta";
-  content: string; // Text content or audio URL
+  type: "audio" | "note" | "visit" | "cta" | "image";
+  content: string; // Text content or audio/image URL
   duration?: string; // For audio
   createdAt: Date;
   author: string;
@@ -48,7 +48,7 @@ export interface SalesRep {
 // Mock Data Generation
 
 const generateInteractions = (count: number): Interaction[] => {
-  const types: Interaction["type"][] = ["audio", "note", "visit", "cta"];
+  const types: Interaction["type"][] = ["audio", "note", "visit", "cta", "image"];
   const interactions: Interaction[] = [];
   
   for (let i = 0; i < count; i++) {
@@ -71,6 +71,9 @@ const generateInteractions = (count: number): Interaction[] => {
         break;
       case "cta":
         content = "Send the updated proposal with the new discount rates.";
+        break;
+      case "image":
+        content = `https://picsum.photos/seed/${Math.random()}/800/600`;
         break;
     }
 
