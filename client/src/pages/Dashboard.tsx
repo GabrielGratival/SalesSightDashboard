@@ -7,6 +7,7 @@ import { Timeline } from "@/components/dashboard/Timeline";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Building2, Calendar, User, MapPin } from "lucide-react";
 import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 export default function Dashboard() {
   const [cities, setCities] = React.useState<City[]>(mockCities);
@@ -57,14 +58,14 @@ export default function Dashboard() {
           </div>
           <div>
             <h1 className="font-heading font-bold text-lg leading-none text-foreground">GovCRM</h1>
-            <p className="text-[10px] text-muted-foreground font-mono uppercase tracking-widest">Commercial Dashboard</p>
+            <p className="text-[10px] text-muted-foreground font-mono uppercase tracking-widest">Dashboard Comercial</p>
           </div>
         </div>
         
         <div className="flex items-center gap-4">
           <div className="text-right hidden md:block">
             <p className="text-sm font-medium">{currentUser.name}</p>
-            <p className="text-xs text-muted-foreground">Sales Representative</p>
+            <p className="text-xs text-muted-foreground">Representante Comercial</p>
           </div>
           <Avatar className="h-9 w-9 ring-2 ring-background shadow-sm">
             <AvatarImage src={currentUser.avatar} />
@@ -101,13 +102,13 @@ export default function Dashboard() {
                       </span>
                       <span className="w-1 h-1 rounded-full bg-border" />
                       <span className="flex items-center gap-1.5">
-                        <User className="w-4 h-4" /> {(selectedCity.population / 1000).toFixed(1)}k inhabitants
+                        <User className="w-4 h-4" /> {(selectedCity.population / 1000).toFixed(1)}k habitantes
                       </span>
                       {selectedCity.lastVisit && (
                         <>
                           <span className="w-1 h-1 rounded-full bg-border" />
                           <span className="flex items-center gap-1.5 text-orange-600/80">
-                            <Calendar className="w-4 h-4" /> Last visit: {format(selectedCity.lastVisit, "MMM d, yyyy")}
+                            <Calendar className="w-4 h-4" /> Última visita: {format(selectedCity.lastVisit, "d MMM, yyyy", { locale: ptBR })}
                           </span>
                         </>
                       )}
@@ -116,10 +117,10 @@ export default function Dashboard() {
                   
                   <div className="bg-secondary/50 px-4 py-2 rounded-lg border border-border/50">
                      <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider block mb-1">
-                       Next Action
+                       Próxima Ação
                      </span>
                      <span className="font-medium text-foreground">
-                       {selectedCity.nextAction || "No action scheduled"}
+                       {selectedCity.nextAction || "Nenhuma ação agendada"}
                      </span>
                   </div>
                 </div>
@@ -143,7 +144,7 @@ export default function Dashboard() {
             </>
           ) : (
             <div className="flex-1 flex items-center justify-center text-muted-foreground">
-              Select a city to view details
+              Selecione uma cidade para ver detalhes
             </div>
           )}
         </main>

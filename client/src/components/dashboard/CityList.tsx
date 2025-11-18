@@ -50,10 +50,10 @@ export function CityList({ cities, selectedCityId, onSelectCity }: CityListProps
     <div className="flex flex-col h-full bg-card border-r border-border">
       <div className="p-4 border-b border-border space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-heading font-semibold">My Portfolio</h2>
+          <h2 className="text-lg font-heading font-semibold">Meu Portfólio</h2>
           {selectedStatuses.length > 0 && (
              <Badge variant="secondary" className="text-xs font-normal">
-               {selectedStatuses.length} filter{selectedStatuses.length > 1 ? 's' : ''} active
+               {selectedStatuses.length} filtro{selectedStatuses.length > 1 ? 's' : ''} ativo(s)
              </Badge>
           )}
         </div>
@@ -62,7 +62,7 @@ export function CityList({ cities, selectedCityId, onSelectCity }: CityListProps
           <div className="relative flex-1">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search cities..."
+              placeholder="Buscar cidades..."
               className="pl-9 bg-secondary/50 border-0 focus-visible:ring-1 focus-visible:bg-background transition-colors h-9"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -95,13 +95,13 @@ export function CityList({ cities, selectedCityId, onSelectCity }: CityListProps
             <PopoverContent className="w-56 p-3" align="end">
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <h4 className="font-medium text-sm">Filter by Status</h4>
+                  <h4 className="font-medium text-sm">Filtrar por Status</h4>
                   {selectedStatuses.length > 0 && (
                     <button 
                       onClick={() => setSelectedStatuses([])}
                       className="text-xs text-muted-foreground hover:text-primary"
                     >
-                      Clear
+                      Limpar
                     </button>
                   )}
                 </div>
@@ -132,13 +132,13 @@ export function CityList({ cities, selectedCityId, onSelectCity }: CityListProps
         <div className="space-y-2">
           {filteredCities.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground text-sm">
-              No cities found matching your filters.
+              Nenhuma cidade encontrada com os filtros atuais.
               {(selectedStatuses.length > 0 || search) && (
                 <button 
                   onClick={clearFilters}
                   className="block mx-auto mt-2 text-primary hover:underline"
                 >
-                  Clear all filters
+                  Limpar todos os filtros
                 </button>
               )}
             </div>
@@ -180,7 +180,7 @@ export function CityList({ cities, selectedCityId, onSelectCity }: CityListProps
 
                 {city.nextAction && (
                   <div className="text-xs text-muted-foreground bg-muted/50 p-1.5 rounded-md mt-2 truncate">
-                    <span className="font-medium text-foreground/80">Next:</span> {city.nextAction}
+                    <span className="font-medium text-foreground/80">Próx:</span> {city.nextAction}
                   </div>
                 )}
               </button>

@@ -2,6 +2,7 @@ import * as React from "react";
 import { Interaction } from "@/lib/mockData";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import { Mic, FileText, MapPin, Send, Flag, Play, Pause, Camera, Image as ImageIcon, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -41,7 +42,7 @@ export function Timeline({ interactions, onAddInteraction }: TimelineProps) {
   return (
     <div className="flex flex-col h-full bg-secondary/10">
       <div className="p-4 border-b border-border bg-card">
-        <h3 className="font-heading font-medium text-lg">Interaction History</h3>
+        <h3 className="font-heading font-medium text-lg">Histórico de Interações</h3>
       </div>
 
       <ScrollArea className="flex-1 p-4">
@@ -63,11 +64,11 @@ export function Timeline({ interactions, onAddInteraction }: TimelineProps) {
                   <div className="flex items-center gap-2">
                     <span className="font-medium text-sm text-foreground">{interaction.author}</span>
                     <span className="text-xs text-muted-foreground bg-secondary px-1.5 py-0.5 rounded-md capitalize">
-                      {interaction.type}
+                      {getInteractionTypeLabel(interaction.type)}
                     </span>
                   </div>
-                  <span className="text-xs text-muted-foreground font-mono">
-                    {format(interaction.createdAt, "MMM d, HH:mm")}
+                  <span className="text-xs text-muted-foreground font-mono capitalize">
+                    {format(interaction.createdAt, "d MMM, HH:mm", { locale: ptBR })}
                   </span>
                 </div>
 
@@ -81,7 +82,7 @@ export function Timeline({ interactions, onAddInteraction }: TimelineProps) {
                     <div className="relative aspect-video w-full bg-muted">
                       <img 
                         src={interaction.content} 
-                        alt="Interaction attachment" 
+                        alt="Anexo da interação" 
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -104,7 +105,7 @@ export function Timeline({ interactions, onAddInteraction }: TimelineProps) {
               value={newNote}
               onChange={(e) => setNewNote(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Type a note about this city..."
+              placeholder="Digite uma nota sobre esta cidade..."
               className="min-h-[60px] border-0 bg-transparent resize-none focus-visible:ring-0 p-2 text-sm"
               data-testid="input-new-note"
             />
@@ -114,7 +115,7 @@ export function Timeline({ interactions, onAddInteraction }: TimelineProps) {
                   variant="ghost" 
                   size="icon" 
                   className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-full"
-                  onClick={() => onAddInteraction("audio", "Voice note recorded")}
+                  onClick={() => onAddInteraction("audio", "Nota de voz gravada")}
                   data-testid="btn-record-audio"
                 >
                   <Mic className="w-4 h-4" />
@@ -136,7 +137,7 @@ export function Timeline({ interactions, onAddInteraction }: TimelineProps) {
                 className="rounded-full px-4"
                 data-testid="btn-send-note"
               >
-                Add Note <Send className="w-3 h-3 ml-2" />
+                Adicionar <Send className="w-3 h-3 ml-2" />
               </Button>
             </div>
           </div>
@@ -151,7 +152,7 @@ export function Timeline({ interactions, onAddInteraction }: TimelineProps) {
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-zinc-500 flex flex-col items-center gap-2">
                 <Camera className="w-12 h-12 opacity-20" />
-                <span className="text-xs font-mono uppercase tracking-widest opacity-40">Camera View</span>
+                <span className="text-xs font-mono uppercase tracking-widest opacity-40">Câmera</span>
               </div>
             </div>
             
@@ -185,6 +186,17 @@ export function Timeline({ interactions, onAddInteraction }: TimelineProps) {
       </Dialog>
     </div>
   );
+}
+
+function getInteractionTypeLabel(type: Interaction["type"]) {
+  switch (type) {
+    case "audio": return "Áudio";
+    case "note": return "Nota";
+    case "visit": return "Visita";
+    case "cta": return "CTA";
+    case "image": return "Imagem";
+    default: return type;
+  }
 }
 
 function getIcon(type: Interaction["type"]) {

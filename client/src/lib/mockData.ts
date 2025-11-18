@@ -60,17 +60,17 @@ const generateInteractions = (count: number): Interaction[] => {
     
     switch (type) {
       case "audio":
-        content = "Audio note about the meeting with the secretary.";
+        content = "Nota de áudio sobre a reunião com o secretário.";
         duration = "2:34";
         break;
       case "note":
-        content = "Called the mayor's office, left a message with the assistant. Need to follow up next Tuesday.";
+        content = "Liguei para o gabinete do prefeito, deixei recado com o assistente. Preciso retornar na próxima terça-feira.";
         break;
       case "visit":
-        content = "Visited the city hall. The infrastructure project is approved but pending budget allocation.";
+        content = "Visitei a prefeitura. O projeto de infraestrutura foi aprovado, mas aguarda alocação orçamentária.";
         break;
       case "cta":
-        content = "Send the updated proposal with the new discount rates.";
+        content = "Enviar a proposta atualizada com as novas taxas de desconto.";
         break;
       case "image":
         content = `https://picsum.photos/seed/${Math.random()}/800/600`;
@@ -113,7 +113,7 @@ export const mockCities: City[] = [
     population: 711825,
     currentStatus: "Quantitativo",
     lastVisit: subDays(new Date(), 2),
-    nextAction: "Present budget proposal",
+    nextAction: "Apresentar proposta de orçamento",
     portfolioOwner: "rep-1",
     interactions: generateInteractions(5)
   },
@@ -124,7 +124,7 @@ export const mockCities: City[] = [
     population: 1213792,
     currentStatus: "Posso",
     lastVisit: subDays(new Date(), 15),
-    nextAction: "Schedule meeting with Mayor",
+    nextAction: "Agendar reunião com o Prefeito",
     portfolioOwner: "rep-1",
     interactions: generateInteractions(3)
   },
@@ -135,7 +135,7 @@ export const mockCities: City[] = [
     population: 687357,
     currentStatus: "Contrato",
     lastVisit: subDays(new Date(), 5),
-    nextAction: "Contract renewal discussion",
+    nextAction: "Discussão de renovação de contrato",
     portfolioOwner: "rep-1",
     interactions: generateInteractions(8)
   },
@@ -146,7 +146,7 @@ export const mockCities: City[] = [
     population: 729737,
     currentStatus: "Quero",
     lastVisit: undefined,
-    nextAction: "Initial outreach",
+    nextAction: "Contato inicial",
     portfolioOwner: "rep-1",
     interactions: generateInteractions(1)
   },
@@ -157,7 +157,7 @@ export const mockCities: City[] = [
     population: 433991,
     currentStatus: "Prefeito",
     lastVisit: subDays(new Date(), 1),
-    nextAction: "Finalize terms",
+    nextAction: "Finalizar termos",
     portfolioOwner: "rep-1",
     interactions: generateInteractions(6)
   }
