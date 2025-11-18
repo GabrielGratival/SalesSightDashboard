@@ -85,11 +85,11 @@ export function Timeline({ interactions, onAddInteraction }: TimelineProps) {
                   {interaction.type === "audio" ? (
                     <AudioPlayer duration={interaction.duration} />
                   ) : interaction.type === "image" ? (
-                    <div className="relative aspect-video w-full max-w-[200px] bg-muted">
+                    <div className="relative w-full max-w-[200px]">
                       <img 
                         src={interaction.content} 
                         alt="Anexo da interação" 
-                        className="w-full h-full object-cover"
+                        className="w-full h-auto block"
                       />
                     </div>
                   ) : (
