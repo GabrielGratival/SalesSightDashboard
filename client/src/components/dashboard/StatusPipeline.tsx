@@ -25,7 +25,7 @@ export function StatusPipeline({ currentStatus, onStatusChange }: StatusPipeline
 
   return (
     <div className="w-full overflow-hidden pb-2 pt-1">
-      <div className="flex items-center justify-between w-full gap-0.5 md:gap-1">
+      <div className="flex items-center justify-between w-full gap-0.5">
         {CRM_STATUSES.map((status, index) => {
           const isCompleted = index < currentIndex;
           const isCurrent = index === currentIndex;
@@ -42,16 +42,16 @@ export function StatusPipeline({ currentStatus, onStatusChange }: StatusPipeline
               >
                 <div 
                   className={cn(
-                    "w-6 h-6 md:w-7 md:h-7 rounded-full flex items-center justify-center shadow-sm transition-colors duration-300 border shrink-0",
+                    "w-9 h-9 md:w-11 md:h-11 rounded-full flex items-center justify-center shadow-sm transition-colors duration-300 border shrink-0",
                     isCompleted ? "bg-primary border-primary text-primary-foreground" : 
-                    isCurrent ? getStatusColor(status) + " border-current ring-2 ring-offset-1 ring-offset-background ring-primary/20" : 
+                    isCurrent ? getStatusColor(status) + " border-current ring-4 ring-offset-2 ring-offset-background ring-primary/20" : 
                     "bg-muted border-muted-foreground/20 text-muted-foreground"
                   )}
                 >
-                  {isCompleted ? <Check className="w-3 h-3 md:w-3.5 md:h-3.5" /> : <span className="text-[10px] font-medium">{index + 1}</span>}
+                  {isCompleted ? <Check className="w-5 h-5 md:w-6 md:h-6" /> : <span className="text-xs md:text-sm font-bold">{index + 1}</span>}
                 </div>
                 <span className={cn(
-                  "text-[9px] md:text-[10px] font-medium text-center transition-colors leading-none truncate w-full px-0.5",
+                  "text-[10px] md:text-xs font-medium text-center transition-colors leading-none truncate w-full px-0.5",
                   isCurrent ? "text-foreground font-bold" : "text-muted-foreground"
                 )}>
                   {status}
@@ -62,8 +62,12 @@ export function StatusPipeline({ currentStatus, onStatusChange }: StatusPipeline
                   <div className="absolute -bottom-1.5 w-full h-0.5 bg-primary/50 rounded-full animate-in fade-in zoom-in duration-300" />
                 )}
               </button>
+              
               {index < CRM_STATUSES.length - 1 && (
-                <div className="h-0.5 flex-1 transition-colors duration-500 mx-0.5 md:mx-1 shrink bg-primary ml-[0px] mr-[0px]" />
+                <div className={cn(
+                  "h-0.5 flex-1 transition-colors duration-500 mx-0.5 shrink min-w-[4px] max-w-[20px] md:max-w-[40px]",
+                  index < currentIndex ? "bg-primary" : "bg-muted"
+                )} />
               )}
             </React.Fragment>
           );
