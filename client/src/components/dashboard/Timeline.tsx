@@ -18,6 +18,15 @@ interface TimelineProps {
 export function Timeline({ interactions, onAddInteraction }: TimelineProps) {
   const [newNote, setNewNote] = React.useState("");
   const [isCameraOpen, setIsCameraOpen] = React.useState(false);
+  const scrollRef = React.useRef<HTMLDivElement>(null);
+  const messagesEndRef = React.useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to bottom when new messages are added
+  React.useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [interactions]);
   
   const handleSend = () => {
     if (!newNote.trim()) return;
@@ -45,7 +54,7 @@ export function Timeline({ interactions, onAddInteraction }: TimelineProps) {
         <h3 className="font-heading font-medium text-xs text-muted-foreground uppercase tracking-wider">Histórico de Interações</h3>
       </div>
 
-      <ScrollArea className="flex-1 p-3">
+      <ScrollArea className="flex-1 p-3" ref={scrollRef}>
         <div className="space-y-3 max-w-3xl mx-auto pb-4">
           {interactions.map((interaction) => (
             <div key={interaction.id} className="flex gap-3 group">
@@ -92,6 +101,7 @@ export function Timeline({ interactions, onAddInteraction }: TimelineProps) {
               </div>
             </div>
           ))}
+          <div ref={messagesEndRef} />
         </div>
       </ScrollArea>
 

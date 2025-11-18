@@ -87,7 +87,8 @@ const generateInteractions = (count: number): Interaction[] => {
     });
   }
   
-  return interactions.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  // Sort by oldest first (Chronological order)
+  return interactions.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 };
 
 export const mockSalesReps: SalesRep[] = [

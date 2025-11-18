@@ -60,7 +60,7 @@ export default function Dashboard() {
 
     setCities(prev => prev.map(city => 
       city.id === selectedCityId 
-        ? { ...city, interactions: [newInteraction, ...city.interactions] }
+        ? { ...city, interactions: [...city.interactions, newInteraction] }
         : city
     ));
   };
