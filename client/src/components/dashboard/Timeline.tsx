@@ -46,12 +46,12 @@ export function Timeline({ interactions, onAddInteraction }: TimelineProps) {
       </div>
 
       <ScrollArea className="flex-1 p-4">
-        <div className="space-y-6 max-w-3xl mx-auto pb-4">
+        <div className="space-y-3 max-w-3xl mx-auto pb-4">
           {interactions.map((interaction) => (
-            <div key={interaction.id} className="flex gap-4 group">
-              <div className="flex flex-col items-center gap-2">
+            <div key={interaction.id} className="flex gap-3 group">
+              <div className="flex flex-col items-center gap-1">
                 <div className={cn(
-                  "w-10 h-10 rounded-full flex items-center justify-center shadow-sm shrink-0 border",
+                  "w-8 h-8 rounded-full flex items-center justify-center shadow-sm shrink-0 border",
                   getIconStyles(interaction.type)
                 )}>
                   {getIcon(interaction.type)}
@@ -59,27 +59,27 @@ export function Timeline({ interactions, onAddInteraction }: TimelineProps) {
                 <div className="w-0.5 flex-1 bg-border group-last:hidden" />
               </div>
               
-              <div className="flex-1 pt-1 pb-6">
-                <div className="flex items-baseline justify-between mb-1.5">
+              <div className="flex-1 pt-0.5 pb-3">
+                <div className="flex items-baseline justify-between mb-1">
                   <div className="flex items-center gap-2">
                     <span className="font-medium text-sm text-foreground">{interaction.author}</span>
-                    <span className="text-xs text-muted-foreground bg-secondary px-1.5 py-0.5 rounded-md capitalize">
+                    <span className="text-[10px] text-muted-foreground bg-secondary px-1.5 py-0 rounded-md capitalize">
                       {getInteractionTypeLabel(interaction.type)}
                     </span>
                   </div>
-                  <span className="text-xs text-muted-foreground font-mono capitalize">
+                  <span className="text-[10px] text-muted-foreground font-mono capitalize">
                     {format(interaction.createdAt, "d MMM, HH:mm", { locale: ptBR })}
                   </span>
                 </div>
 
                 <div className={cn(
-                  "bg-card rounded-2xl rounded-tl-none border border-border shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden",
-                  interaction.type === "image" ? "p-0" : "p-4"
+                  "bg-card rounded-xl rounded-tl-none border border-border shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden",
+                  interaction.type === "image" ? "p-0" : "p-3"
                 )}>
                   {interaction.type === "audio" ? (
                     <AudioPlayer duration={interaction.duration} />
                   ) : interaction.type === "image" ? (
-                    <div className="relative aspect-video w-full bg-muted">
+                    <div className="relative aspect-video w-full max-w-[240px] bg-muted">
                       <img 
                         src={interaction.content} 
                         alt="Anexo da interação" 
@@ -87,7 +87,7 @@ export function Timeline({ interactions, onAddInteraction }: TimelineProps) {
                       />
                     </div>
                   ) : (
-                    <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap">
+                    <p className="text-sm text-foreground/90 leading-snug whitespace-pre-wrap">
                       {interaction.content}
                     </p>
                   )}
@@ -201,11 +201,11 @@ function getInteractionTypeLabel(type: Interaction["type"]) {
 
 function getIcon(type: Interaction["type"]) {
   switch (type) {
-    case "audio": return <Mic className="w-5 h-5" />;
-    case "note": return <FileText className="w-5 h-5" />;
-    case "visit": return <MapPin className="w-5 h-5" />;
-    case "cta": return <Flag className="w-5 h-5" />;
-    case "image": return <ImageIcon className="w-5 h-5" />;
+    case "audio": return <Mic className="w-4 h-4" />;
+    case "note": return <FileText className="w-4 h-4" />;
+    case "visit": return <MapPin className="w-4 h-4" />;
+    case "cta": return <Flag className="w-4 h-4" />;
+    case "image": return <ImageIcon className="w-4 h-4" />;
   }
 }
 
