@@ -1,7 +1,7 @@
 import * as React from "react";
 import { City, CRM_STATUSES, CRMStatus } from "@/lib/mockData";
 import { cn } from "@/lib/utils";
-import { ChevronRight, Search, Filter, X, Star } from "lucide-react";
+import { Search, Filter, X, Star, ArrowDownWideNarrow as SortIcon, ArrowUpDown } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface CityListProps {
   cities: City[];
@@ -20,18 +28,62 @@ interface CityListProps {
   onSelectCity: (cityId: string) => void;
 }
 
+type SortOption = 'name' | 'temperature' | 'priority' | 'status' | 'lastVisit';
+
 export function CityList({ cities, selectedCityId, onSelectCity }: CityListProps) {
   const [search, setSearch] = React.useState("");
   const [selectedStatuses, setSelectedStatuses] = React.useState<CRMStatus[]>([]);
+  const [sortBy, setSortBy] = React.useState<SortOption>('priority');
 
-  const filteredCities = cities.filter(city => {
-    const matchesSearch = city.name.toLowerCase().includes(search.toLowerCase()) ||
-      city.state.toLowerCase().includes(search.toLowerCase());
-    
-    const matchesStatus = selectedStatuses.length === 0 || selectedStatuses.includes(city.currentStatus);
+  const filteredCities = React.useMemo(() => {
+    let result = cities.filter(city => {
+      const matchesSearch = city.name.toLowerCase().includes(search.toLowerCase()) ||
+        city.state.toLowerCase().includes(search.toLowerCase());
+      
+      const matchesStatus = selectedStatuses.length === 0 || selectedStatuses.includes(city.currentStatus);
 
-    return matchesSearch && matchesStatus;
-  });
+      return matchesSearch && matchesStatus;
+    });
+
+    // Sorting logic
+    result.sort((a, b) => {
+      if (sortBy === 'priority') {
+        if (a.isPriority && !b.isPriority) return -1;
+        if (!a.isPriority && b.isPriority) return 1;
+        return 0;
+      }
+
+      if (sortBy === 'temperature') {
+        const tempOrder = { hot: 0, warm: 1, cold: 2, undefined: 3 };
+        const aTemp = a.temperature || 'undefined';
+        const bTemp = b.temperature || 'undefined';
+        return tempOrder[aTemp as keyof typeof tempOrder] - tempOrder[bTemp as keyof typeof tempOrder];
+      }
+
+      if (sortBy === 'status') {
+        // Order: Contrato -> Prefeito -> Quantitativo -> Posso -> Devo -> Quero
+        const statusOrder = {
+          "Contrato": 0,
+          "Prefeito": 1,
+          "Quantitativo": 2,
+          "Posso": 3,
+          "Devo": 4,
+          "Quero": 5
+        };
+        return statusOrder[a.currentStatus] - statusOrder[b.currentStatus];
+      }
+
+      if (sortBy === 'lastVisit') {
+        if (!a.lastVisit) return 1;
+        if (!b.lastVisit) return -1;
+        return b.lastVisit.getTime() - a.lastVisit.getTime();
+      }
+
+      return a.name.localeCompare(b.name);
+    });
+
+    return result;
+  }, [cities, search, selectedStatuses, sortBy]);
 
   const toggleStatus = (status: CRMStatus) => {
     setSelectedStatuses(prev => 
@@ -51,11 +103,40 @@ export function CityList({ cities, selectedCityId, onSelectCity }: CityListProps
       <div className="p-3 border-b border-border space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-heading font-semibold">Meu Portfólio</h2>
-          {selectedStatuses.length > 0 && (
-             <Badge variant="secondary" className="text-[10px] px-1.5 py-0 font-normal">
-               {selectedStatuses.length}
-             </Badge>
-          )}
+          <div className="flex items-center gap-1">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-primary">
+                  <ArrowUpDown className="h-3.5 w-3.5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuLabel className="text-xs">Ordenar por</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setSortBy('priority')} className="text-xs">
+                  ⭐ Prioridades primeiro
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortBy('temperature')} className="text-xs">
+                  🔥 Temperatura (Quente → Fria)
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortBy('status')} className="text-xs">
+                  📈 Funil (Contrato → Quero)
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortBy('lastVisit')} className="text-xs">
+                  📅 Visita mais recente
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortBy('name')} className="text-xs">
+                  🔤 Nome (A-Z)
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {selectedStatuses.length > 0 && (
+               <Badge variant="secondary" className="text-[10px] px-1.5 py-0 font-normal">
+                 {selectedStatuses.length}
+               </Badge>
+            )}
+          </div>
         </div>
         
         <div className="flex gap-2">
