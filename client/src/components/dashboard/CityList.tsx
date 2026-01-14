@@ -1,7 +1,7 @@
 import * as React from "react";
 import { City, CRM_STATUSES, CRMStatus } from "@/lib/mockData";
 import { cn } from "@/lib/utils";
-import { Search, Filter, X, Star, ArrowDownWideNarrow as SortIcon, ArrowUpDown } from "lucide-react";
+import { Search, Filter, X, Star, ArrowUpDown } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
@@ -61,7 +61,6 @@ export function CityList({ cities, selectedCityId, onSelectCity }: CityListProps
       }
 
       if (sortBy === 'status') {
-        // Order: Contrato -> Prefeito -> Quantitativo -> Posso -> Devo -> Quero
         const statusOrder = {
           "Contrato": 0,
           "Prefeito": 1,
@@ -103,10 +102,37 @@ export function CityList({ cities, selectedCityId, onSelectCity }: CityListProps
       <div className="p-3 border-b border-border space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-heading font-semibold">Meu Portfólio</h2>
-          <div className="flex items-center gap-1">
+          {selectedStatuses.length > 0 && (
+             <Badge variant="secondary" className="text-[10px] px-1.5 py-0 font-normal">
+               {selectedStatuses.length} filtro(s)
+             </Badge>
+          )}
+        </div>
+        
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-2 top-2 h-3.5 w-3.5 text-muted-foreground" />
+            <Input
+              placeholder="Buscar..."
+              className="pl-7 bg-secondary/50 border-0 focus-visible:ring-1 focus-visible:bg-background transition-colors h-8 text-xs"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              data-testid="input-search-cities"
+            />
+            {search && (
+              <button 
+                onClick={() => setSearch("")}
+                className="absolute right-2 top-2 text-muted-foreground hover:text-foreground"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
+          </div>
+
+          <div className="flex gap-1">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-primary">
+                <Button variant="outline" size="icon" className="h-8 w-8 shrink-0 bg-secondary/50 border-0 hover:bg-secondary">
                   <ArrowUpDown className="h-3.5 w-3.5" />
                 </Button>
               </DropdownMenuTrigger>
@@ -131,81 +157,54 @@ export function CityList({ cities, selectedCityId, onSelectCity }: CityListProps
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {selectedStatuses.length > 0 && (
-               <Badge variant="secondary" className="text-[10px] px-1.5 py-0 font-normal">
-                 {selectedStatuses.length}
-               </Badge>
-            )}
-          </div>
-        </div>
-        
-        <div className="flex gap-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-2 top-2 h-3.5 w-3.5 text-muted-foreground" />
-            <Input
-              placeholder="Buscar..."
-              className="pl-7 bg-secondary/50 border-0 focus-visible:ring-1 focus-visible:bg-background transition-colors h-8 text-xs"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              data-testid="input-search-cities"
-            />
-            {search && (
-              <button 
-                onClick={() => setSearch("")}
-                className="absolute right-2 top-2 text-muted-foreground hover:text-foreground"
-              >
-                <X className="h-3.5 w-3.5" />
-              </button>
-            )}
-          </div>
-
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button 
-                variant={selectedStatuses.length > 0 ? "default" : "outline"} 
-                size="icon" 
-                className={cn(
-                  "h-8 w-8 shrink-0",
-                  selectedStatuses.length > 0 ? "bg-primary text-primary-foreground" : "bg-secondary/50 border-0 hover:bg-secondary"
-                )}
-                data-testid="btn-filter-status"
-              >
-                <Filter className="h-3.5 w-3.5" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-56 p-2" align="end">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <h4 className="font-medium text-xs">Status</h4>
-                  {selectedStatuses.length > 0 && (
-                    <button 
-                      onClick={() => setSelectedStatuses([])}
-                      className="text-[10px] text-muted-foreground hover:text-primary"
-                    >
-                      Limpar
-                    </button>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button 
+                  variant={selectedStatuses.length > 0 ? "default" : "outline"} 
+                  size="icon" 
+                  className={cn(
+                    "h-8 w-8 shrink-0",
+                    selectedStatuses.length > 0 ? "bg-primary text-primary-foreground" : "bg-secondary/50 border-0 hover:bg-secondary"
                   )}
-                </div>
-                <div className="space-y-1">
-                  {CRM_STATUSES.map((status) => (
-                    <div key={status} className="flex items-center space-x-2">
-                      <Checkbox 
-                        id={`filter-${status}`} 
-                        checked={selectedStatuses.includes(status)}
-                        onCheckedChange={() => toggleStatus(status)}
-                      />
-                      <Label 
-                        htmlFor={`filter-${status}`}
-                        className="text-xs font-normal cursor-pointer flex-1"
+                  data-testid="btn-filter-status"
+                >
+                  <Filter className="h-3.5 w-3.5" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-56 p-2" align="end">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-medium text-xs">Status</h4>
+                    {selectedStatuses.length > 0 && (
+                      <button 
+                        onClick={() => setSelectedStatuses([])}
+                        className="text-[10px] text-muted-foreground hover:text-primary"
                       >
-                        {status}
-                      </Label>
-                    </div>
-                  ))}
+                        Limpar
+                      </button>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    {CRM_STATUSES.map((status) => (
+                      <div key={status} className="flex items-center space-x-2">
+                        <Checkbox 
+                          id={`filter-${status}`} 
+                          checked={selectedStatuses.includes(status)}
+                          onCheckedChange={() => toggleStatus(status)}
+                        />
+                        <Label 
+                          htmlFor={`filter-${status}`}
+                          className="text-xs font-normal cursor-pointer flex-1"
+                        >
+                          {status}
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            </PopoverContent>
-          </Popover>
+              </PopoverContent>
+            </Popover>
+          </div>
         </div>
       </div>
       
