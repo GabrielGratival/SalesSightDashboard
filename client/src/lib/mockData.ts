@@ -72,13 +72,13 @@ const generateInteractions = (count: number): Interaction[] => {
         duration = "2:34";
         break;
       case "note":
-        content = "Liguei para o gabinete do prefeito, deixei recado com o assistente. Preciso retornar na próxima terça-feira.";
+        content = "Liguei para o gabinete do prefeito, deixei recado com o assistente.";
         break;
       case "visit":
-        content = "Visitei a prefeitura. O projeto de infraestrutura foi aprovado, mas aguarda alocação orçamentária.";
+        content = "Visitei a prefeitura. O projeto foi discutido.";
         break;
       case "cta":
-        content = "Enviar a proposta atualizada com as novas taxas de desconto.";
+        content = "Enviar proposta atualizada.";
         break;
       case "image":
         content = `https://picsum.photos/seed/${Math.random()}/800/600`;
@@ -95,9 +95,80 @@ const generateInteractions = (count: number): Interaction[] => {
     });
   }
   
-  // Sort by oldest first (Chronological order)
   return interactions.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 };
+
+const BRAZILIAN_CITIES = [
+  { name: "Sertãozinho", state: "SP" }, { name: "Jaboticabal", state: "SP" }, { name: "Bebedouro", state: "SP" },
+  { name: "Batatais", state: "SP" }, { name: "Franca", state: "SP" }, { name: "Araraquara", state: "SP" },
+  { name: "São Carlos", state: "SP" }, { name: "Matão", state: "SP" }, { name: "Catanduva", state: "SP" },
+  { name: "Barretos", state: "SP" }, { name: "Olímpia", state: "SP" }, { name: "Piracicaba", state: "SP" },
+  { name: "Limeira", state: "SP" }, { name: "Americana", state: "SP" }, { name: "Sumaré", state: "SP" },
+  { name: "Hortolândia", state: "SP" }, { name: "Indaiatuba", state: "SP" }, { name: "Itu", state: "SP" },
+  { name: "Salto", state: "SP" }, { name: "Jundiaí", state: "SP" }, { name: "Vinhedo", state: "SP" },
+  { name: "Valinhos", state: "SP" }, { name: "Louveira", state: "SP" }, { name: "Itatiba", state: "SP" },
+  { name: "Atibaia", state: "SP" }, { name: "Bragança Paulista", state: "SP" }, { name: "Mairiporã", state: "SP" },
+  { name: "Guarulhos", state: "SP" }, { name: "Osasco", state: "SP" }, { name: "Barueri", state: "SP" },
+  { name: "Santana de Parnaíba", state: "SP" }, { name: "Itapevi", state: "SP" }, { name: "Cotia", state: "SP" },
+  { name: "Taboão da Serra", state: "SP" }, { name: "Embu das Artes", state: "SP" }, { name: "Itapecerica da Serra", state: "SP" },
+  { name: "Santo André", state: "SP" }, { name: "São Bernardo do Campo", state: "SP" }, { name: "São Caetano do Sul", state: "SP" },
+  { name: "Diadema", state: "SP" }, { name: "Mauá", state: "SP" }, { name: "Ribeirão Pires", state: "SP" }
+];
+
+export const mockCities: City[] = (() => {
+  const cities: City[] = [];
+  const today = startOfDay(new Date());
+
+  // Generate 5 cities per day for 7 days
+  for (let day = 0; day < 7; day++) {
+    for (let i = 0; i < 5; i++) {
+      const cityIdx = day * 5 + i;
+      const data = BRAZILIAN_CITIES[cityIdx] || { name: `Cidade ${cityIdx}`, state: "SP" };
+      cities.push({
+        id: `city-${cityIdx}`,
+        name: data.name,
+        state: data.state,
+        population: Math.floor(Math.random() * 500000) + 20000,
+        currentStatus: CRM_STATUSES[Math.floor(Math.random() * CRM_STATUSES.length)],
+        lastVisit: subDays(new Date(), Math.floor(Math.random() * 30)),
+        nextVisit: addDays(today, day),
+        portfolioOwner: "rep-1",
+        interactions: generateInteractions(Math.floor(Math.random() * 5) + 1),
+        temperature: (['hot', 'warm', 'cold'] as const)[Math.floor(Math.random() * 3)],
+        isPriority: Math.random() > 0.7,
+        isInVAAR: Math.random() > 0.5
+      });
+    }
+  }
+
+  // Add some unscheduled cities
+  for (let i = 0; i < 10; i++) {
+    const idx = 35 + i;
+    const data = BRAZILIAN_CITIES[idx] || { name: `Cidade Extra ${i}`, state: "SP" };
+    cities.push({
+      id: `city-unscheduled-${i}`,
+      name: data.name,
+      state: data.state,
+      population: Math.floor(Math.random() * 100000) + 10000,
+      currentStatus: CRM_STATUSES[Math.floor(Math.random() * CRM_STATUSES.length)],
+      lastVisit: subDays(new Date(), Math.floor(Math.random() * 60)),
+      nextVisit: undefined,
+      portfolioOwner: "rep-1",
+      interactions: generateInteractions(1),
+      temperature: 'cold',
+      isPriority: false,
+      isInVAAR: false
+    });
+  }
+
+  return cities;
+})();
+
+function startOfDay(date: Date) {
+  const newDate = new Date(date);
+  newDate.setHours(0, 0, 0, 0);
+  return newDate;
+}
 
 export const mockSalesReps: SalesRep[] = [
   {
@@ -105,90 +176,5 @@ export const mockSalesReps: SalesRep[] = [
     name: "Carlos Silva",
     email: "carlos@company.com",
     avatar: "https://i.pravatar.cc/150?u=carlos"
-  },
-  {
-    id: "rep-2",
-    name: "Ana Souza",
-    email: "ana@company.com",
-    avatar: "https://i.pravatar.cc/150?u=ana"
-  }
-];
-
-export const mockCities: City[] = [
-  {
-    id: "city-1",
-    name: "Ribeirão Preto",
-    state: "SP",
-    population: 711825,
-    currentStatus: "Quantitativo",
-    lastVisit: subDays(new Date(), 2),
-    nextAction: "Apresentar proposta de orçamento",
-    portfolioOwner: "rep-1",
-    interactions: generateInteractions(5),
-    temperature: 'hot',
-    isPriority: true,
-    isInVAAR: true,
-    educationSpending: "12.5M",
-    nextVisit: new Date()
-  },
-  {
-    id: "city-2",
-    name: "Campinas",
-    state: "SP",
-    population: 1213792,
-    currentStatus: "Posso",
-    lastVisit: subDays(new Date(), 15),
-    nextAction: "Agendar reunião com o Prefeito",
-    portfolioOwner: "rep-1",
-    interactions: generateInteractions(3),
-    temperature: 'warm',
-    isPriority: false,
-    isInVAAR: false,
-    nextVisit: addDays(new Date(), 1)
-  },
-  {
-    id: "city-3",
-    name: "Sorocaba",
-    state: "SP",
-    population: 687357,
-    currentStatus: "Contrato",
-    lastVisit: subDays(new Date(), 5),
-    nextAction: "Discussão de renovação de contrato",
-    portfolioOwner: "rep-1",
-    interactions: generateInteractions(8),
-    temperature: 'hot',
-    isPriority: true,
-    isInVAAR: true,
-    nextVisit: addDays(new Date(), 3)
-  },
-  {
-    id: "city-4",
-    name: "São José dos Campos",
-    state: "SP",
-    population: 729737,
-    currentStatus: "Quero",
-    lastVisit: undefined,
-    nextAction: "Contato inicial",
-    portfolioOwner: "rep-1",
-    interactions: generateInteractions(1),
-    temperature: 'cold',
-    isPriority: false,
-    isInVAAR: false,
-    nextVisit: addDays(new Date(), 7)
-  },
-  {
-    id: "city-5",
-    name: "Santos",
-    state: "SP",
-    population: 433991,
-    currentStatus: "Prefeito",
-    lastVisit: subDays(new Date(), 1),
-    nextAction: "Finalizar termos",
-    portfolioOwner: "rep-1",
-    interactions: generateInteractions(6),
-    temperature: 'warm',
-    isPriority: true,
-    isInVAAR: true,
-    nextVisit: addDays(new Date(), 2)
   }
 ];
