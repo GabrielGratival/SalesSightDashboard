@@ -1,7 +1,7 @@
 import * as React from "react";
 import { City, CRM_STATUSES, CRMStatus } from "@/lib/mockData";
 import { cn } from "@/lib/utils";
-import { ChevronRight, Search, Filter, X } from "lucide-react";
+import { ChevronRight, Search, Filter, X, Star } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
@@ -148,16 +148,22 @@ export function CityList({ cities, selectedCityId, onSelectCity }: CityListProps
                 data-testid={`city-card-${city.id}`}
               >
                 <div className="flex justify-between items-center mb-0.5">
-                  <div className="font-medium text-xs text-foreground group-hover:text-primary transition-colors flex items-center gap-1.5">
+                  <div className="font-medium text-xs text-foreground group-hover:text-primary transition-colors flex items-center gap-1.5 flex-1 min-w-0">
+                    {city.isPriority && <Star className="w-2.5 h-2.5 fill-yellow-500 text-yellow-500 shrink-0" />}
                     <span className="truncate">{city.name}</span>
-                    <span className="text-[10px] font-mono text-muted-foreground bg-muted px-1 rounded">{city.state}</span>
+                    <span className="text-[10px] font-mono text-muted-foreground bg-muted px-1 rounded shrink-0">{city.state}</span>
                   </div>
-                  <span className={cn(
-                    "text-[9px] px-1.5 py-0 rounded-full font-medium uppercase tracking-wider",
-                    getStatusBadgeColor(city.currentStatus)
-                  )}>
-                    {city.currentStatus}
-                  </span>
+                  <div className="flex items-center gap-1 shrink-0">
+                    {city.temperature === 'hot' && <span className="text-[10px]" title="Quente">🔥</span>}
+                    {city.temperature === 'warm' && <span className="text-[10px]" title="Morna">🌤️</span>}
+                    {city.temperature === 'cold' && <span className="text-[10px]" title="Fria">❄️</span>}
+                    <span className={cn(
+                      "text-[9px] px-1.5 py-0 rounded-full font-medium uppercase tracking-wider",
+                      getStatusBadgeColor(city.currentStatus)
+                    )}>
+                      {city.currentStatus}
+                    </span>
+                  </div>
                 </div>
               </button>
             ))

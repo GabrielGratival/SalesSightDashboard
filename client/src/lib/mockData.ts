@@ -36,6 +36,13 @@ export interface City {
   nextAction?: string;
   portfolioOwner: string; // Sales rep ID
   interactions: Interaction[];
+  temperature?: 'cold' | 'warm' | 'hot';
+  isPriority?: boolean;
+  mayor?: string;
+  viceMayor?: string;
+  educationSecretary?: string;
+  educationSpending?: string;
+  isInVAAR?: boolean;
 }
 
 export interface SalesRep {
@@ -116,7 +123,11 @@ export const mockCities: City[] = [
     lastVisit: subDays(new Date(), 2),
     nextAction: "Apresentar proposta de orçamento",
     portfolioOwner: "rep-1",
-    interactions: generateInteractions(5)
+    interactions: generateInteractions(5),
+    temperature: 'hot',
+    isPriority: true,
+    isInVAAR: true,
+    educationSpending: "12.5M"
   },
   {
     id: "city-2",
@@ -127,7 +138,10 @@ export const mockCities: City[] = [
     lastVisit: subDays(new Date(), 15),
     nextAction: "Agendar reunião com o Prefeito",
     portfolioOwner: "rep-1",
-    interactions: generateInteractions(3)
+    interactions: generateInteractions(3),
+    temperature: 'warm',
+    isPriority: false,
+    isInVAAR: false
   },
   {
     id: "city-3",
@@ -138,7 +152,10 @@ export const mockCities: City[] = [
     lastVisit: subDays(new Date(), 5),
     nextAction: "Discussão de renovação de contrato",
     portfolioOwner: "rep-1",
-    interactions: generateInteractions(8)
+    interactions: generateInteractions(8),
+    temperature: 'hot',
+    isPriority: true,
+    isInVAAR: true
   },
   {
     id: "city-4",
@@ -149,7 +166,10 @@ export const mockCities: City[] = [
     lastVisit: undefined,
     nextAction: "Contato inicial",
     portfolioOwner: "rep-1",
-    interactions: generateInteractions(1)
+    interactions: generateInteractions(1),
+    temperature: 'cold',
+    isPriority: false,
+    isInVAAR: false
   },
   {
     id: "city-5",
@@ -160,6 +180,9 @@ export const mockCities: City[] = [
     lastVisit: subDays(new Date(), 1),
     nextAction: "Finalizar termos",
     portfolioOwner: "rep-1",
-    interactions: generateInteractions(6)
+    interactions: generateInteractions(6),
+    temperature: 'warm',
+    isPriority: true,
+    isInVAAR: true
   }
 ];

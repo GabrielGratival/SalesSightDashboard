@@ -5,17 +5,16 @@ import { CityList } from "@/components/dashboard/CityList";
 import { StatusPipeline } from "@/components/dashboard/StatusPipeline";
 import { Timeline } from "@/components/dashboard/Timeline";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Building2, Calendar, User, MapPin, ArrowLeft, PanelLeft, ChevronLeft, ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
-import { cn } from "@/lib/utils";
+import { Building2, Calendar, User, MapPin, ArrowLeft, PanelLeft, ChevronLeft, ChevronRight, Thermometer, Info, Star, ChevronDown, ChevronUp, Landmark, GraduationCap, Coins } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export default function Dashboard() {
   const [cities, setCities] = React.useState<City[]>(mockCities);
   const [selectedCityId, setSelectedCityId] = React.useState<string | null>(cities[0]?.id || null);
   const [isMobileListView, setIsMobileListView] = React.useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(true);
+  const [isInfoExpanded, setIsInfoExpanded] = React.useState(false);
   const currentUser = mockSalesReps[0]; // Mock logged in user
 
   const selectedCity = React.useMemo(
@@ -42,6 +41,24 @@ export default function Dashboard() {
     setCities(prev => prev.map(city => 
       city.id === selectedCityId 
         ? { ...city, currentStatus: newStatus } 
+        : city
+    ));
+  };
+
+  const handleTogglePriority = () => {
+    if (!selectedCityId) return;
+    setCities(prev => prev.map(city => 
+      city.id === selectedCityId 
+        ? { ...city, isPriority: !city.isPriority } 
+        : city
+    ));
+  };
+
+  const handleTemperatureChange = (temp: 'cold' | 'warm' | 'hot') => {
+    if (!selectedCityId) return;
+    setCities(prev => prev.map(city => 
+      city.id === selectedCityId 
+        ? { ...city, temperature: temp } 
         : city
     ));
   };
@@ -141,11 +158,60 @@ export default function Dashboard() {
               <div className="bg-card border-b border-border shadow-sm z-10 px-4 py-2 md:px-6">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-2">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-baseline gap-2">
-                      <h2 className="text-lg md:text-xl font-heading font-bold text-foreground tracking-tight truncate">
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-lg md:text-xl font-heading font-bold text-foreground tracking-tight truncate flex items-center gap-2">
                         {selectedCity.name}
-                        <span className="ml-2 text-sm font-mono text-muted-foreground bg-muted px-1.5 py-0.5 rounded uppercase">{selectedCity.state}</span>
+                        <span className="text-sm font-mono text-muted-foreground bg-muted px-1.5 py-0.5 rounded uppercase">{selectedCity.state}</span>
                       </h2>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className={cn(
+                          "h-8 w-8 rounded-full transition-colors",
+                          selectedCity.isPriority ? "text-yellow-500 hover:text-yellow-600 bg-yellow-50" : "text-muted-foreground hover:text-yellow-500"
+                        )}
+                        onClick={handleTogglePriority}
+                        data-testid="btn-toggle-priority"
+                      >
+                        <Star className={cn("h-4 w-4", selectedCity.isPriority && "fill-current")} />
+                      </Button>
+                    </div>
+                  </div>
+                  
+                  {/* Temperature Control */}
+                  <div className="flex items-center bg-secondary/30 p-1 rounded-lg border border-border/50">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="flex items-center gap-1 px-1 mr-1 text-muted-foreground">
+                            <Thermometer className="w-3 h-3" />
+                            <Info className="w-2.5 h-2.5 opacity-50" />
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="text-xs">Classificação de temperatura comercial</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    <div className="flex gap-0.5">
+                      {[
+                        { id: 'cold', label: '❄️ Fria', color: 'text-blue-600 bg-blue-50 border-blue-100' },
+                        { id: 'warm', label: '🌤️ Morna', color: 'text-orange-600 bg-orange-50 border-orange-100' },
+                        { id: 'hot', label: '🔥 Quente', color: 'text-red-600 bg-red-50 border-red-100' }
+                      ].map((t) => (
+                        <button
+                          key={t.id}
+                          onClick={() => handleTemperatureChange(t.id as any)}
+                          className={cn(
+                            "px-2 py-0.5 rounded text-[10px] font-bold transition-all border border-transparent",
+                            selectedCity.temperature === t.id 
+                              ? t.color + " border-current shadow-sm" 
+                              : "text-muted-foreground hover:bg-secondary/50"
+                          )}
+                        >
+                          {t.label}
+                        </button>
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -157,6 +223,65 @@ export default function Dashboard() {
                     onStatusChange={handleStatusChange}
                   />
                 </div>
+
+                {/* Strategic Info Collapsible */}
+                <Collapsible
+                  open={isInfoExpanded}
+                  onOpenChange={setIsInfoExpanded}
+                  className="mt-2 border-t border-border/40 pt-2"
+                >
+                  <CollapsibleTrigger asChild>
+                    <Button variant="ghost" className="w-full h-7 flex items-center justify-between px-2 hover:bg-secondary/30 text-muted-foreground group">
+                      <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider">
+                        <Info className="w-3 h-3" />
+                        Informações Estratégicas
+                      </div>
+                      {isInfoExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                    </Button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="mt-2 space-y-3 pb-2 animate-in fade-in slide-in-from-top-1 duration-200">
+                    <div className="grid grid-cols-2 gap-4 px-2">
+                      <div className="space-y-2">
+                        <div className="flex flex-col">
+                          <span className="text-[10px] text-muted-foreground flex items-center gap-1 uppercase font-bold tracking-tighter">
+                            <Landmark className="w-3 h-3" /> Liderança Política
+                          </span>
+                          <span className="text-xs font-medium">Prefeito: {selectedCity.mayor || "João Silva (MDB)"}</span>
+                          <span className="text-[10px] text-muted-foreground">Vice: {selectedCity.viceMayor || "Maria Santos (PT)"}</span>
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-[10px] text-muted-foreground flex items-center gap-1 uppercase font-bold tracking-tighter">
+                            <GraduationCap className="w-3 h-3" /> Educação
+                          </span>
+                          <span className="text-xs font-medium">Sec. Educação: {selectedCity.educationSecretary || "Ana Paula"}</span>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex flex-col">
+                          <span className="text-[10px] text-muted-foreground flex items-center gap-1 uppercase font-bold tracking-tighter">
+                            <Coins className="w-3 h-3" /> Gastos Educação
+                          </span>
+                          <span className="text-xs font-bold text-primary">R$ {selectedCity.educationSpending || "4.2M"}</span>
+                          <span className="text-[10px] text-muted-foreground">24.5% do orçamento</span>
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-[10px] text-muted-foreground flex items-center gap-1 uppercase font-bold tracking-tighter">
+                            🏛️ Status VAAR
+                          </span>
+                          <span className={cn(
+                            "text-xs font-bold",
+                            selectedCity.isInVAAR ? "text-green-600" : "text-red-600"
+                          )}>
+                            {selectedCity.isInVAAR ? "No VAAR" : "Não está no VAAR"}
+                          </span>
+                          {!selectedCity.isInVAAR && (
+                            <span className="text-[10px] text-muted-foreground leading-tight">Motivo: Falta condicionalidade III (Gestão Democrática)</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
               </div>
 
               {/* Timeline & Interactions */}

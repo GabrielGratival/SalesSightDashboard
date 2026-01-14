@@ -1,0 +1,127 @@
+You are designing an enhancement to an existing CRM mobile view used by a field sales team that sells to Brazilian municipalities (B2G).
+The current screen already contains:
+
+City header (city + state)
+
+Deal stage stepper
+
+Interaction history (notes, follow-ups)
+
+Input to add notes after a visit
+
+This screen is primarily used immediately after an in-person visit and must remain fast, scannable, and low-friction.
+
+Objective
+
+Design and specify the best UX solution to enrich this view with structured sales intelligence and post-visit qualification, without cluttering the interface.
+
+Required Capabilities to Add
+1. City Temperature Classification (Post-Visit)
+
+Allow the seller to classify the commercial temperature of the city after the visit.
+
+Requirements
+
+Must be quick to fill (≤ 3 seconds)
+
+Must not require typing by default
+
+Must be visually scannable later in pipeline views
+
+Expected UX Pattern
+
+Discrete control (e.g., segmented control, chips, or swipe selector)
+
+Clear semantic labels (e.g., 🔥 Quente, 🌤️ Morna, ❄️ Fria)
+
+Optional tooltip or info icon explaining criteria (not mandatory to read)
+
+2. Mark as Priority for Upcoming Weeks
+
+Allow the seller to flag the city as priority for the next weeks.
+
+Requirements
+
+Binary action (priority / not priority)
+
+Must be reversible
+
+Must be visible at a glance when returning to the screen
+
+Expected UX Pattern
+
+Star / flag / pin icon near the city name
+
+Optional secondary option: “priority until” (date picker only if expanded)
+
+3. Sales Intelligence Panel (Read-Only, Structured)
+
+Include a compact, structured information section to support the sales conversation.
+
+Information to Display
+
+VAAR status
+
+Está no VAAR? (Sim / Não)
+
+If “Não”: qual condicionalidade impede?
+
+Political leadership
+
+Prefeito: nome + partido
+
+Vice-prefeito: nome + partido
+
+Education leadership
+
+Secretário(a) de Educação: nome
+
+Education spending
+
+Quanto a cidade já gastou em educação até o momento (R$)
+
+Optional: % do orçamento (if available)
+
+UX Constraints
+
+Read-only (no editing in this screen)
+
+Must not overwhelm the user
+
+Must allow quick scanning during or after a visit
+
+Expected UX Pattern
+
+Collapsible section (“Informações estratégicas da cidade”)
+
+Label → value layout
+
+Use icons sparingly to aid scanning (e.g., 🏛️, 📚, 💰)
+
+Graceful empty states (“Dados não disponíveis”)
+
+UX & Product Principles to Follow
+
+Progressive disclosure: advanced data hidden by default
+
+Thumb-friendly: optimized for one-hand mobile use
+
+Post-visit flow: temperature + priority should feel like a natural “wrap-up”
+
+No modal overload: prefer inline or expandable sections
+
+Brazilian public-sector context: language and labels in PT-BR
+
+Deliverables Expected from You
+
+UI structure proposal (sections and hierarchy)
+
+Component recommendations (chips, icons, collapses, etc.)
+
+Microcopy suggestions (labels, helper text)
+
+Interaction flow (what the seller does in the last 30 seconds of a visit)
+
+Optional: wireframe description (textual, no images required)
+
+Design as if this will be used dozens of times per week by a field seller under time pressure.
