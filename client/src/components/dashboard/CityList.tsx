@@ -1,7 +1,7 @@
 import * as React from "react";
 import { City, CRM_STATUSES, CRMStatus } from "@/lib/mockData";
 import { cn } from "@/lib/utils";
-import { MapPin, Users, ChevronRight, Search, Filter, X } from "lucide-react";
+import { ChevronRight, Search, Filter, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
@@ -48,22 +48,22 @@ export function CityList({ cities, selectedCityId, onSelectCity }: CityListProps
 
   return (
     <div className="flex flex-col h-full bg-card border-r border-border">
-      <div className="p-4 border-b border-border space-y-4">
+      <div className="p-3 border-b border-border space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-heading font-semibold">Meu Portfólio</h2>
+          <h2 className="text-sm font-heading font-semibold">Meu Portfólio</h2>
           {selectedStatuses.length > 0 && (
-             <Badge variant="secondary" className="text-xs font-normal">
-               {selectedStatuses.length} filtro{selectedStatuses.length > 1 ? 's' : ''} ativo(s)
+             <Badge variant="secondary" className="text-[10px] px-1.5 py-0 font-normal">
+               {selectedStatuses.length}
              </Badge>
           )}
         </div>
         
         <div className="flex gap-2">
           <div className="relative flex-1">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-2 top-2 h-3.5 w-3.5 text-muted-foreground" />
             <Input
-              placeholder="Buscar cidades..."
-              className="pl-9 bg-secondary/50 border-0 focus-visible:ring-1 focus-visible:bg-background transition-colors h-9"
+              placeholder="Buscar..."
+              className="pl-7 bg-secondary/50 border-0 focus-visible:ring-1 focus-visible:bg-background transition-colors h-8 text-xs"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               data-testid="input-search-cities"
@@ -71,9 +71,9 @@ export function CityList({ cities, selectedCityId, onSelectCity }: CityListProps
             {search && (
               <button 
                 onClick={() => setSearch("")}
-                className="absolute right-2.5 top-2.5 text-muted-foreground hover:text-foreground"
+                className="absolute right-2 top-2 text-muted-foreground hover:text-foreground"
               >
-                <X className="h-4 w-4" />
+                <X className="h-3.5 w-3.5" />
               </button>
             )}
           </div>
@@ -84,28 +84,28 @@ export function CityList({ cities, selectedCityId, onSelectCity }: CityListProps
                 variant={selectedStatuses.length > 0 ? "default" : "outline"} 
                 size="icon" 
                 className={cn(
-                  "h-9 w-9 shrink-0",
+                  "h-8 w-8 shrink-0",
                   selectedStatuses.length > 0 ? "bg-primary text-primary-foreground" : "bg-secondary/50 border-0 hover:bg-secondary"
                 )}
                 data-testid="btn-filter-status"
               >
-                <Filter className="h-4 w-4" />
+                <Filter className="h-3.5 w-3.5" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-56 p-3" align="end">
-              <div className="space-y-3">
+            <PopoverContent className="w-56 p-2" align="end">
+              <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <h4 className="font-medium text-sm">Filtrar por Status</h4>
+                  <h4 className="font-medium text-xs">Status</h4>
                   {selectedStatuses.length > 0 && (
                     <button 
                       onClick={() => setSelectedStatuses([])}
-                      className="text-xs text-muted-foreground hover:text-primary"
+                      className="text-[10px] text-muted-foreground hover:text-primary"
                     >
                       Limpar
                     </button>
                   )}
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-1">
                   {CRM_STATUSES.map((status) => (
                     <div key={status} className="flex items-center space-x-2">
                       <Checkbox 
@@ -115,7 +115,7 @@ export function CityList({ cities, selectedCityId, onSelectCity }: CityListProps
                       />
                       <Label 
                         htmlFor={`filter-${status}`}
-                        className="text-sm font-normal cursor-pointer flex-1"
+                        className="text-xs font-normal cursor-pointer flex-1"
                       >
                         {status}
                       </Label>
@@ -128,19 +128,11 @@ export function CityList({ cities, selectedCityId, onSelectCity }: CityListProps
         </div>
       </div>
       
-      <ScrollArea className="flex-1 p-3">
-        <div className="space-y-2">
+      <ScrollArea className="flex-1 p-2">
+        <div className="space-y-1.5">
           {filteredCities.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground text-sm">
-              Nenhuma cidade encontrada com os filtros atuais.
-              {(selectedStatuses.length > 0 || search) && (
-                <button 
-                  onClick={clearFilters}
-                  className="block mx-auto mt-2 text-primary hover:underline"
-                >
-                  Limpar todos os filtros
-                </button>
-              )}
+            <div className="text-center py-4 text-muted-foreground text-xs">
+              Vazio
             </div>
           ) : (
             filteredCities.map((city) => (
@@ -148,41 +140,25 @@ export function CityList({ cities, selectedCityId, onSelectCity }: CityListProps
                 key={city.id}
                 onClick={() => onSelectCity(city.id)}
                 className={cn(
-                  "w-full text-left p-3 rounded-xl border transition-all duration-200 group",
+                  "w-full text-left p-2 rounded-lg border transition-all duration-200 group",
                   selectedCityId === city.id 
                     ? "bg-primary/5 border-primary/20 shadow-sm" 
                     : "bg-card border-transparent hover:bg-secondary hover:border-border"
                 )}
                 data-testid={`city-card-${city.id}`}
               >
-                <div className="flex justify-between items-start mb-1">
-                  <div className="font-medium text-foreground group-hover:text-primary transition-colors">
-                    {city.name}
+                <div className="flex justify-between items-center mb-0.5">
+                  <div className="font-medium text-xs text-foreground group-hover:text-primary transition-colors flex items-center gap-1.5">
+                    <span className="truncate">{city.name}</span>
+                    <span className="text-[10px] font-mono text-muted-foreground bg-muted px-1 rounded">{city.state}</span>
                   </div>
                   <span className={cn(
-                    "text-[10px] px-2 py-0.5 rounded-full font-medium uppercase tracking-wider",
+                    "text-[9px] px-1.5 py-0 rounded-full font-medium uppercase tracking-wider",
                     getStatusBadgeColor(city.currentStatus)
                   )}>
                     {city.currentStatus}
                   </span>
                 </div>
-                
-                <div className="flex items-center gap-3 text-xs text-muted-foreground mb-2">
-                  <div className="flex items-center gap-1">
-                    <MapPin className="w-3 h-3" />
-                    {city.state}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Users className="w-3 h-3" />
-                    {(city.population / 1000).toFixed(1)}k
-                  </div>
-                </div>
-
-                {city.nextAction && (
-                  <div className="text-xs text-muted-foreground bg-muted/50 p-1.5 rounded-md mt-2 truncate">
-                    <span className="font-medium text-foreground/80">Próx:</span> {city.nextAction}
-                  </div>
-                )}
               </button>
             ))
           )}

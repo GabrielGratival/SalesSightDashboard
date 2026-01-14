@@ -144,34 +144,9 @@ export default function Dashboard() {
                     <div className="flex items-baseline gap-2">
                       <h2 className="text-lg md:text-xl font-heading font-bold text-foreground tracking-tight truncate">
                         {selectedCity.name}
+                        <span className="ml-2 text-sm font-mono text-muted-foreground bg-muted px-1.5 py-0.5 rounded uppercase">{selectedCity.state}</span>
                       </h2>
-                      <div className="flex items-center gap-2 text-[10px] md:text-xs text-muted-foreground">
-                        <span className="flex items-center gap-0.5">
-                          <MapPin className="w-3 h-3" /> {selectedCity.state}
-                        </span>
-                        <span className="w-0.5 h-0.5 rounded-full bg-border" />
-                        <span className="flex items-center gap-0.5">
-                          <User className="w-3 h-3" /> {(selectedCity.population / 1000).toFixed(0)}k
-                        </span>
-                        {selectedCity.lastVisit && (
-                          <>
-                            <span className="w-0.5 h-0.5 rounded-full bg-border" />
-                            <span className="flex items-center gap-0.5 text-orange-600/80">
-                              <Calendar className="w-3 h-3" /> {format(selectedCity.lastVisit, "d MMM", { locale: ptBR })}
-                            </span>
-                          </>
-                        )}
-                      </div>
                     </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-2 self-start md:self-center w-full md:w-auto bg-secondary/30 px-2 py-1 rounded-md border border-border/50">
-                     <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider whitespace-nowrap">
-                       Próx:
-                     </span>
-                     <span className="text-xs font-medium text-foreground truncate max-w-[200px]">
-                       {selectedCity.nextAction || "Nenhuma"}
-                     </span>
                   </div>
                 </div>
 
