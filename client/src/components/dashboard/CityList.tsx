@@ -22,7 +22,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { format, isToday, isTomorrow, startOfDay } from "date-fns";
+import { format, isToday, isTomorrow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 interface CityListProps {
@@ -99,7 +99,7 @@ export function CityList({ cities, selectedCityId, onSelectCity }: CityListProps
     const groups: { [key: string]: City[] } = {};
     
     sortedAndFiltered.forEach(city => {
-      let label = "Sem data";
+      let label = "Não agendadas";
       if (city.nextVisit) {
         if (isToday(city.nextVisit)) label = "Hoje";
         else if (isTomorrow(city.nextVisit)) label = "Amanhã";
