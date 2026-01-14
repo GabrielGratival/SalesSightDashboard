@@ -116,35 +116,15 @@ export function Timeline({ interactions, onAddInteraction }: TimelineProps) {
               className="min-h-[40px] border-0 bg-transparent resize-none focus-visible:ring-0 p-2 text-sm"
               data-testid="input-new-note"
             />
-            <div className="flex justify-between items-center px-1 pb-0.5 mt-1">
-              <div className="flex gap-1">
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-7 w-7 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-full"
-                  onClick={() => onAddInteraction("audio", "Nota de voz gravada")}
-                  data-testid="btn-record-audio"
-                >
-                  <Mic className="w-3.5 h-3.5" />
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-7 w-7 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-full"
-                  onClick={() => setIsCameraOpen(true)}
-                  data-testid="btn-open-camera"
-                >
-                  <Camera className="w-3.5 h-3.5" />
-                </Button>
-              </div>
+            <div className="flex justify-end items-center px-1 pb-0.5 mt-1">
               <Button 
                 size="sm" 
                 onClick={handleSend} 
                 disabled={!newNote.trim()}
-                className="rounded-full px-3 h-7 text-xs"
+                className="rounded-full px-4 h-7 text-xs font-bold"
                 data-testid="btn-send-note"
               >
-                Enviar <Send className="w-3 h-3 ml-1.5" />
+                Gravar Nota
               </Button>
             </div>
           </div>
