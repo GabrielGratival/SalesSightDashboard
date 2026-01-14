@@ -235,7 +235,14 @@ export function CityList({ cities, selectedCityId, onSelectCity }: CityListProps
                     <div className="font-medium text-xs text-foreground group-hover:text-primary transition-colors flex items-center gap-1.5 flex-1 min-w-0">
                       {city.isPriority && <Star className="w-2.5 h-2.5 fill-yellow-500 text-yellow-500 shrink-0" />}
                       <span className="truncate">{city.name}</span>
-                      <span className="text-[10px] font-mono text-muted-foreground bg-muted px-1 rounded shrink-0">{city.state}</span>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <span className="text-[10px] font-mono text-muted-foreground bg-muted px-1 rounded">{city.state}</span>
+                        {city.lastVisit && (
+                          <span className="text-[9px] text-muted-foreground/60 font-light">
+                            • {format(city.lastVisit, "dd/MM", { locale: ptBR })}
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <div className="flex items-center gap-1 shrink-0">
                       {city.temperature === 'hot' && <span className="text-[10px]" title="Quente">🔥</span>}
@@ -249,11 +256,6 @@ export function CityList({ cities, selectedCityId, onSelectCity }: CityListProps
                       </span>
                     </div>
                   </div>
-                  {city.lastVisit && (
-                    <div className="text-[10px] text-muted-foreground/60 font-light mt-0.5">
-                      {format(city.lastVisit, "dd/MM/yyyy", { locale: ptBR })}
-                    </div>
-                  )}
                 </div>
               </button>
             ))
