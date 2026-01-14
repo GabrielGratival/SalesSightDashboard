@@ -230,26 +230,28 @@ export function CityList({ cities, selectedCityId, onSelectCity }: CityListProps
                 )}
                 data-testid={`city-card-${city.id}`}
               >
-                <div className="flex justify-between items-center mb-0.5">
-                  <div className="font-medium text-xs text-foreground group-hover:text-primary transition-colors flex items-center gap-1.5 flex-1 min-w-0">
-                    {city.isPriority && <Star className="w-2.5 h-2.5 fill-yellow-500 text-yellow-500 shrink-0" />}
-                    <span className="truncate">{city.name}</span>
-                    <span className="text-[10px] font-mono text-muted-foreground bg-muted px-1 rounded shrink-0">{city.state}</span>
-                  </div>
-                  <div className="flex items-center gap-1 shrink-0">
-                    {city.temperature === 'hot' && <span className="text-[10px]" title="Quente">🔥</span>}
-                    {city.temperature === 'warm' && <span className="text-[10px]" title="Morna">🌤️</span>}
-                    {city.temperature === 'cold' && <span className="text-[10px]" title="Fria">❄️</span>}
-                    <span className={cn(
-                      "text-[9px] px-1.5 py-0 rounded-full font-medium uppercase tracking-wider",
-                      getStatusBadgeColor(city.currentStatus)
-                    )}>
-                      {city.currentStatus}
-                    </span>
+                <div className="flex flex-col mb-0.5">
+                  <div className="flex justify-between items-center">
+                    <div className="font-medium text-xs text-foreground group-hover:text-primary transition-colors flex items-center gap-1.5 flex-1 min-w-0">
+                      {city.isPriority && <Star className="w-2.5 h-2.5 fill-yellow-500 text-yellow-500 shrink-0" />}
+                      <span className="truncate">{city.name}</span>
+                      <span className="text-[10px] font-mono text-muted-foreground bg-muted px-1 rounded shrink-0">{city.state}</span>
+                    </div>
+                    <div className="flex items-center gap-1 shrink-0">
+                      {city.temperature === 'hot' && <span className="text-[10px]" title="Quente">🔥</span>}
+                      {city.temperature === 'warm' && <span className="text-[10px]" title="Morna">🌤️</span>}
+                      {city.temperature === 'cold' && <span className="text-[10px]" title="Fria">❄️</span>}
+                      <span className={cn(
+                        "text-[9px] px-1.5 py-0 rounded-full font-medium uppercase tracking-wider",
+                        getStatusBadgeColor(city.currentStatus)
+                      )}>
+                        {city.currentStatus}
+                      </span>
+                    </div>
                   </div>
                   {city.lastVisit && (
                     <div className="text-[10px] text-muted-foreground/60 font-light mt-0.5">
-                      Última visita: {format(city.lastVisit, "dd/MM/yyyy", { locale: ptBR })}
+                      {format(city.lastVisit, "dd/MM/yyyy", { locale: ptBR })}
                     </div>
                   )}
                 </div>
