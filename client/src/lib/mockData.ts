@@ -1,4 +1,4 @@
-import { format, subDays, subHours } from "date-fns";
+import { format, subDays, subHours, addDays } from "date-fns";
 
 export type CRMStatus = 
   | "Quero" 
@@ -43,6 +43,7 @@ export interface City {
   educationSecretary?: string;
   educationSpending?: string;
   isInVAAR?: boolean;
+  nextVisit?: Date;
 }
 
 export interface SalesRep {
@@ -127,7 +128,8 @@ export const mockCities: City[] = [
     temperature: 'hot',
     isPriority: true,
     isInVAAR: true,
-    educationSpending: "12.5M"
+    educationSpending: "12.5M",
+    nextVisit: new Date()
   },
   {
     id: "city-2",
@@ -141,7 +143,8 @@ export const mockCities: City[] = [
     interactions: generateInteractions(3),
     temperature: 'warm',
     isPriority: false,
-    isInVAAR: false
+    isInVAAR: false,
+    nextVisit: addDays(new Date(), 1)
   },
   {
     id: "city-3",
@@ -155,7 +158,8 @@ export const mockCities: City[] = [
     interactions: generateInteractions(8),
     temperature: 'hot',
     isPriority: true,
-    isInVAAR: true
+    isInVAAR: true,
+    nextVisit: addDays(new Date(), 3)
   },
   {
     id: "city-4",
@@ -169,7 +173,8 @@ export const mockCities: City[] = [
     interactions: generateInteractions(1),
     temperature: 'cold',
     isPriority: false,
-    isInVAAR: false
+    isInVAAR: false,
+    nextVisit: addDays(new Date(), 7)
   },
   {
     id: "city-5",
@@ -183,6 +188,7 @@ export const mockCities: City[] = [
     interactions: generateInteractions(6),
     temperature: 'warm',
     isPriority: true,
-    isInVAAR: true
+    isInVAAR: true,
+    nextVisit: addDays(new Date(), 2)
   }
 ];

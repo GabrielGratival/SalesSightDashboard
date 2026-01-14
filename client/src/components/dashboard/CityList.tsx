@@ -22,7 +22,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { format } from "date-fns";
+import { format, isToday, isTomorrow, startOfDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 interface CityListProps {
@@ -31,14 +31,14 @@ interface CityListProps {
   onSelectCity: (cityId: string) => void;
 }
 
-type SortOption = 'name' | 'temperature' | 'priority' | 'status' | 'lastVisit';
+type SortOption = 'name' | 'temperature' | 'priority' | 'status' | 'lastVisit' | 'nextVisit';
 
 export function CityList({ cities, selectedCityId, onSelectCity }: CityListProps) {
   const [search, setSearch] = React.useState("");
   const [selectedStatuses, setSelectedStatuses] = React.useState<CRMStatus[]>([]);
   const [sortBy, setSortBy] = React.useState<SortOption>('priority');
 
-  const filteredCities = React.useMemo(() => {
+  const sortedAndFiltered = React.useMemo(() => {
     let result = cities.filter(city => {
       const matchesSearch = city.name.toLowerCase().includes(search.toLowerCase()) ||
         city.state.toLowerCase().includes(search.toLowerCase());
@@ -81,11 +81,37 @@ export function CityList({ cities, selectedCityId, onSelectCity }: CityListProps
         return b.lastVisit.getTime() - a.lastVisit.getTime();
       }
 
+      if (sortBy === 'nextVisit') {
+        if (!a.nextVisit) return 1;
+        if (!b.nextVisit) return -1;
+        return a.nextVisit.getTime() - b.nextVisit.getTime();
+      }
+
       return a.name.localeCompare(b.name);
     });
 
     return result;
   }, [cities, search, selectedStatuses, sortBy]);
+
+  const groupedCities = React.useMemo(() => {
+    if (sortBy !== 'nextVisit') return null;
+
+    const groups: { [key: string]: City[] } = {};
+    
+    sortedAndFiltered.forEach(city => {
+      let label = "Sem data";
+      if (city.nextVisit) {
+        if (isToday(city.nextVisit)) label = "Hoje";
+        else if (isTomorrow(city.nextVisit)) label = "Amanhã";
+        else label = format(city.nextVisit, "EEEE", { locale: ptBR });
+      }
+      
+      if (!groups[label]) groups[label] = [];
+      groups[label].push(city);
+    });
+
+    return groups;
+  }, [sortedAndFiltered, sortBy]);
 
   const toggleStatus = (status: CRMStatus) => {
     setSelectedStatuses(prev => 
@@ -99,6 +125,48 @@ export function CityList({ cities, selectedCityId, onSelectCity }: CityListProps
     setSelectedStatuses([]);
     setSearch("");
   };
+
+  const renderCityCard = (city: City) => (
+    <button
+      key={city.id}
+      onClick={() => onSelectCity(city.id)}
+      className={cn(
+        "w-full text-left p-2 rounded-lg border transition-all duration-200 group shadow-sm",
+        selectedCityId === city.id 
+          ? "bg-primary/5 border-primary/30 ring-1 ring-primary/20" 
+          : "bg-card border-border hover:bg-secondary/50"
+      )}
+      data-testid={`city-card-${city.id}`}
+    >
+      <div className="flex flex-col mb-0.5">
+        <div className="flex justify-between items-center">
+          <div className="font-medium text-xs text-foreground group-hover:text-primary transition-colors flex items-center gap-1.5 flex-1 min-w-0">
+            {city.isPriority && <Star className="w-2.5 h-2.5 fill-yellow-500 text-yellow-500 shrink-0" />}
+            <span className="truncate">{city.name}</span>
+            <div className="flex items-center gap-1 shrink-0">
+              <span className="text-[10px] font-mono text-muted-foreground bg-muted px-1 rounded">{city.state}</span>
+              {city.lastVisit && (
+                <span className="text-[9px] text-muted-foreground/60 font-light">
+                  • {format(city.lastVisit, "dd/MM", { locale: ptBR })}
+                </span>
+              )}
+            </div>
+          </div>
+          <div className="flex items-center gap-1 shrink-0">
+            {city.temperature === 'hot' && <span className="text-[10px]" title="Quente">🔥</span>}
+            {city.temperature === 'warm' && <span className="text-[10px]" title="Morna">🌤️</span>}
+            {city.temperature === 'cold' && <span className="text-[10px]" title="Fria">❄️</span>}
+            <span className={cn(
+              "text-[9px] px-1.5 py-0 rounded-full font-medium uppercase tracking-wider",
+              getStatusBadgeColor(city.currentStatus)
+            )}>
+              {city.currentStatus}
+            </span>
+          </div>
+        </div>
+      </div>
+    </button>
+  );
 
   return (
     <div className="flex flex-col h-full bg-card border-r border-border">
@@ -144,6 +212,9 @@ export function CityList({ cities, selectedCityId, onSelectCity }: CityListProps
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => setSortBy('priority')} className="text-xs">
                   ⭐ Prioridades primeiro
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortBy('nextVisit')} className="text-xs">
+                  📅 Próximas visitas
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setSortBy('temperature')} className="text-xs">
                   🔥 Temperatura (Quente → Fria)
@@ -212,53 +283,26 @@ export function CityList({ cities, selectedCityId, onSelectCity }: CityListProps
       </div>
       
       <ScrollArea className="flex-1 p-2">
-        <div className="space-y-1.5">
-          {filteredCities.length === 0 ? (
+        <div className="space-y-4">
+          {sortedAndFiltered.length === 0 ? (
             <div className="text-center py-4 text-muted-foreground text-xs">
               Vazio
             </div>
-          ) : (
-            filteredCities.map((city) => (
-              <button
-                key={city.id}
-                onClick={() => onSelectCity(city.id)}
-                className={cn(
-                  "w-full text-left p-2 rounded-lg border transition-all duration-200 group shadow-sm",
-                  selectedCityId === city.id 
-                    ? "bg-primary/5 border-primary/30 ring-1 ring-primary/20" 
-                    : "bg-card border-border hover:bg-secondary/50"
-                )}
-                data-testid={`city-card-${city.id}`}
-              >
-                <div className="flex flex-col mb-0.5">
-                  <div className="flex justify-between items-center">
-                    <div className="font-medium text-xs text-foreground group-hover:text-primary transition-colors flex items-center gap-1.5 flex-1 min-w-0">
-                      {city.isPriority && <Star className="w-2.5 h-2.5 fill-yellow-500 text-yellow-500 shrink-0" />}
-                      <span className="truncate">{city.name}</span>
-                      <div className="flex items-center gap-1 shrink-0">
-                        <span className="text-[10px] font-mono text-muted-foreground bg-muted px-1 rounded">{city.state}</span>
-                        {city.lastVisit && (
-                          <span className="text-[9px] text-muted-foreground/60 font-light">
-                            • {format(city.lastVisit, "dd/MM", { locale: ptBR })}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1 shrink-0">
-                      {city.temperature === 'hot' && <span className="text-[10px]" title="Quente">🔥</span>}
-                      {city.temperature === 'warm' && <span className="text-[10px]" title="Morna">🌤️</span>}
-                      {city.temperature === 'cold' && <span className="text-[10px]" title="Fria">❄️</span>}
-                      <span className={cn(
-                        "text-[9px] px-1.5 py-0 rounded-full font-medium uppercase tracking-wider",
-                        getStatusBadgeColor(city.currentStatus)
-                      )}>
-                        {city.currentStatus}
-                      </span>
-                    </div>
-                  </div>
+          ) : groupedCities ? (
+            Object.entries(groupedCities).map(([label, items]) => (
+              <div key={label} className="space-y-1.5">
+                <div className="flex items-center gap-2 px-1">
+                  <div className="h-px flex-1 bg-border" />
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{label}</span>
+                  <div className="h-px flex-1 bg-border" />
                 </div>
-              </button>
+                {items.map(renderCityCard)}
+              </div>
             ))
+          ) : (
+            <div className="space-y-1.5">
+              {sortedAndFiltered.map(renderCityCard)}
+            </div>
           )}
         </div>
       </ScrollArea>
