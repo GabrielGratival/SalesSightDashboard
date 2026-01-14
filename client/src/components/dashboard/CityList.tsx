@@ -140,10 +140,10 @@ export function CityList({ cities, selectedCityId, onSelectCity }: CityListProps
                 key={city.id}
                 onClick={() => onSelectCity(city.id)}
                 className={cn(
-                  "w-full text-left p-2 rounded-lg border transition-all duration-200 group",
+                  "w-full text-left p-2 rounded-lg border transition-all duration-200 group shadow-sm",
                   selectedCityId === city.id 
-                    ? "bg-primary/5 border-primary/20 shadow-sm" 
-                    : "bg-card border-transparent hover:bg-secondary hover:border-border"
+                    ? "bg-primary/5 border-primary/30 ring-1 ring-primary/20" 
+                    : "bg-card border-border hover:bg-secondary/50"
                 )}
                 data-testid={`city-card-${city.id}`}
               >
