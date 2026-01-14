@@ -22,6 +22,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+
 interface CityListProps {
   cities: City[];
   selectedCityId: string | null;
@@ -244,6 +247,11 @@ export function CityList({ cities, selectedCityId, onSelectCity }: CityListProps
                       {city.currentStatus}
                     </span>
                   </div>
+                  {city.lastVisit && (
+                    <div className="text-[10px] text-muted-foreground/60 font-light mt-0.5">
+                      Última visita: {format(city.lastVisit, "dd/MM/yyyy", { locale: ptBR })}
+                    </div>
+                  )}
                 </div>
               </button>
             ))
