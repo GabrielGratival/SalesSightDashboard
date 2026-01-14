@@ -169,15 +169,18 @@ export default function Dashboard() {
                       </h2>
                       <Button
                         variant="ghost"
-                        size="icon"
+                        size="sm"
                         className={cn(
-                          "h-8 w-8 rounded-full transition-colors",
-                          selectedCity.isPriority ? "text-yellow-500 hover:text-yellow-600 bg-yellow-50" : "text-muted-foreground hover:text-yellow-500"
+                          "h-7 px-2 rounded-full transition-all text-[10px] font-bold uppercase tracking-wider gap-1.5",
+                          selectedCity.isPriority 
+                            ? "text-yellow-600 bg-yellow-50 border border-yellow-200 hover:bg-yellow-100 shadow-sm" 
+                            : "text-muted-foreground hover:text-yellow-600 hover:bg-yellow-50/50"
                         )}
                         onClick={handleTogglePriority}
                         data-testid="btn-toggle-priority"
                       >
-                        <Star className={cn("h-4 w-4", selectedCity.isPriority && "fill-current")} />
+                        <Star className={cn("h-3 w-3", selectedCity.isPriority && "fill-current")} />
+                        Prioridade na visita
                       </Button>
                     </div>
                   </div>

@@ -112,7 +112,7 @@ export function Timeline({ interactions, onAddInteraction }: TimelineProps) {
               value={newNote}
               onChange={(e) => setNewNote(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Digite uma nota..."
+              placeholder="Digite uma nota particular (visível somente para você)"
               className="min-h-[40px] border-0 bg-transparent resize-none focus-visible:ring-0 p-2 text-sm"
               data-testid="input-new-note"
             />
