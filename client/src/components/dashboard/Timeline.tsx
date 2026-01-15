@@ -50,7 +50,6 @@ export function Timeline({ interactions, onAddInteraction }: TimelineProps) {
 
   return (
     <div className="flex flex-col h-full bg-secondary/10">
-
       <ScrollArea className="flex-1 p-3" ref={scrollRef}>
         <div className="space-y-3 max-w-3xl mx-auto pb-4">
           {interactions.map((interaction) => (
