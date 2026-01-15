@@ -36,6 +36,8 @@ type SortOption = 'name' | 'temperature' | 'priority' | 'status' | 'lastVisit' |
 export function CityList({ cities, selectedCityId, onSelectCity }: CityListProps) {
   const [search, setSearch] = React.useState("");
   const [selectedStatuses, setSelectedStatuses] = React.useState<CRMStatus[]>([]);
+  const [showPriorities, setShowPriorities] = React.useState<boolean | null>(null); // null = all, true = only priorities, false = no priorities
+  const [selectedTemperatures, setSelectedTemperatures] = React.useState<('hot' | 'warm' | 'cold')[]>([]);
   const [sortBy, setSortBy] = React.useState<SortOption>('priority');
 
   const sortedAndFiltered = React.useMemo(() => {
@@ -44,8 +46,15 @@ export function CityList({ cities, selectedCityId, onSelectCity }: CityListProps
         city.state.toLowerCase().includes(search.toLowerCase());
       
       const matchesStatus = selectedStatuses.length === 0 || selectedStatuses.includes(city.currentStatus);
+      
+      const matchesPriority = showPriorities === null || 
+        (showPriorities === true && city.isPriority) ||
+        (showPriorities === false && !city.isPriority);
+      
+      const matchesTemperature = selectedTemperatures.length === 0 || 
+        (city.temperature && selectedTemperatures.includes(city.temperature));
 
-      return matchesSearch && matchesStatus;
+      return matchesSearch && matchesStatus && matchesPriority && matchesTemperature;
     });
 
     // Sorting logic
@@ -91,24 +100,50 @@ export function CityList({ cities, selectedCityId, onSelectCity }: CityListProps
     });
 
     return result;
-  }, [cities, search, selectedStatuses, sortBy]);
+  }, [cities, search, selectedStatuses, showPriorities, selectedTemperatures, sortBy]);
 
   const groupedCities = React.useMemo(() => {
-    if (sortBy !== 'nextVisit') return null;
-
     const groups: { [key: string]: City[] } = {};
     
-    sortedAndFiltered.forEach(city => {
-      let label = "Não agendadas";
-      if (city.nextVisit) {
-        if (isToday(city.nextVisit)) label = "Hoje";
-        else if (isTomorrow(city.nextVisit)) label = "Amanhã";
-        else label = format(city.nextVisit, "EEEE", { locale: ptBR });
-      }
-      
-      if (!groups[label]) groups[label] = [];
-      groups[label].push(city);
-    });
+    if (sortBy === 'nextVisit') {
+      sortedAndFiltered.forEach(city => {
+        let label = "Não agendadas";
+        if (city.nextVisit) {
+          if (isToday(city.nextVisit)) label = "Hoje";
+          else if (isTomorrow(city.nextVisit)) label = "Amanhã";
+          else label = format(city.nextVisit, "EEEE", { locale: ptBR });
+        }
+        
+        if (!groups[label]) groups[label] = [];
+        groups[label].push(city);
+      });
+    } else if (sortBy === 'priority') {
+      sortedAndFiltered.forEach(city => {
+        const label = city.isPriority ? "Prioridades" : "Não Prioridades";
+        
+        if (!groups[label]) groups[label] = [];
+        groups[label].push(city);
+      });
+    } else if (sortBy === 'status') {
+      sortedAndFiltered.forEach(city => {
+        const label = city.currentStatus;
+        
+        if (!groups[label]) groups[label] = [];
+        groups[label].push(city);
+      });
+    } else if (sortBy === 'temperature') {
+      sortedAndFiltered.forEach(city => {
+        let label = "Sem temperatura";
+        if (city.temperature === 'hot') label = "Quente";
+        else if (city.temperature === 'warm') label = "Morna";
+        else if (city.temperature === 'cold') label = "Fria";
+        
+        if (!groups[label]) groups[label] = [];
+        groups[label].push(city);
+      });
+    } else {
+      return null;
+    }
 
     return groups;
   }, [sortedAndFiltered, sortBy]);
@@ -123,8 +158,20 @@ export function CityList({ cities, selectedCityId, onSelectCity }: CityListProps
 
   const clearFilters = () => {
     setSelectedStatuses([]);
+    setShowPriorities(null);
+    setSelectedTemperatures([]);
     setSearch("");
   };
+
+  const toggleTemperature = (temp: 'hot' | 'warm' | 'cold') => {
+    setSelectedTemperatures(prev => 
+      prev.includes(temp) 
+        ? prev.filter(t => t !== temp)
+        : [...prev, temp]
+    );
+  };
+
+  const hasActiveFilters = selectedStatuses.length > 0 || showPriorities !== null || selectedTemperatures.length > 0;
 
   const renderCityCard = (city: City) => (
     <button
@@ -172,10 +219,10 @@ export function CityList({ cities, selectedCityId, onSelectCity }: CityListProps
     <div className="flex flex-col h-full bg-card border-r border-border">
       <div className="p-3 border-b border-border space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-heading font-semibold">Meu Portfólio</h2>
-          {selectedStatuses.length > 0 && (
+          <h2 className="text-sm font-heading font-semibold">Portfólio Comercial - Diego</h2>
+          {hasActiveFilters && (
              <Badge variant="secondary" className="text-[10px] px-1.5 py-0 font-normal">
-               {selectedStatuses.length} filtro(s)
+               {selectedStatuses.length + (showPriorities !== null ? 1 : 0) + selectedTemperatures.length} filtro(s)
              </Badge>
           )}
         </div>
@@ -234,46 +281,106 @@ export function CityList({ cities, selectedCityId, onSelectCity }: CityListProps
             <Popover>
               <PopoverTrigger asChild>
                 <Button 
-                  variant={selectedStatuses.length > 0 ? "default" : "outline"} 
+                  variant={hasActiveFilters ? "default" : "outline"} 
                   size="icon" 
                   className={cn(
                     "h-8 w-8 shrink-0",
-                    selectedStatuses.length > 0 ? "bg-primary text-primary-foreground" : "bg-secondary/50 border-0 hover:bg-secondary"
+                    hasActiveFilters ? "bg-primary text-primary-foreground" : "bg-secondary/50 border-0 hover:bg-secondary"
                   )}
                   data-testid="btn-filter-status"
                 >
                   <Filter className="h-3.5 w-3.5" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-56 p-2" align="end">
-                <div className="space-y-2">
+              <PopoverContent className="w-64 p-3" align="end">
+                <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <h4 className="font-medium text-xs">Status</h4>
-                    {selectedStatuses.length > 0 && (
+                    <h4 className="font-medium text-xs">Filtros</h4>
+                    {hasActiveFilters && (
                       <button 
-                        onClick={() => setSelectedStatuses([])}
+                        onClick={clearFilters}
                         className="text-[10px] text-muted-foreground hover:text-primary"
                       >
-                        Limpar
+                        Limpar tudo
                       </button>
                     )}
                   </div>
-                  <div className="space-y-1">
-                    {CRM_STATUSES.map((status) => (
-                      <div key={status} className="flex items-center space-x-2">
+                  
+                  {/* Prioridades Filter */}
+                  <div className="space-y-2">
+                    <h5 className="font-medium text-[11px] text-muted-foreground uppercase tracking-wider">Prioridades</h5>
+                    <div className="space-y-1">
+                      <div className="flex items-center space-x-2">
                         <Checkbox 
-                          id={`filter-${status}`} 
-                          checked={selectedStatuses.includes(status)}
-                          onCheckedChange={() => toggleStatus(status)}
+                          id="filter-priorities-only" 
+                          checked={showPriorities === true}
+                          onCheckedChange={(checked) => setShowPriorities(checked ? true : null)}
                         />
                         <Label 
-                          htmlFor={`filter-${status}`}
-                          className="text-xs font-normal cursor-pointer flex-1"
+                          htmlFor="filter-priorities-only"
+                          className="text-xs font-normal cursor-pointer flex-1 flex items-center gap-1"
                         >
-                          {status}
+                          <Star className="w-3 h-3 fill-yellow-500 text-yellow-500" />
+                          Apenas prioridades
                         </Label>
                       </div>
-                    ))}
+                    </div>
+                  </div>
+
+                  {/* Temperature Filter */}
+                  <div className="space-y-2">
+                    <h5 className="font-medium text-[11px] text-muted-foreground uppercase tracking-wider">Temperatura</h5>
+                    <div className="space-y-1">
+                      {[
+                        { id: 'hot' as const, label: '🔥 Quente', emoji: '🔥' },
+                        { id: 'warm' as const, label: '🌤️ Média', emoji: '🌤️' },
+                        { id: 'cold' as const, label: '❄️ Fria', emoji: '❄️' }
+                      ].map((temp) => (
+                        <div key={temp.id} className="flex items-center space-x-2">
+                          <Checkbox 
+                            id={`filter-temp-${temp.id}`} 
+                            checked={selectedTemperatures.includes(temp.id)}
+                            onCheckedChange={() => toggleTemperature(temp.id)}
+                          />
+                          <Label 
+                            htmlFor={`filter-temp-${temp.id}`}
+                            className="text-xs font-normal cursor-pointer flex-1"
+                          >
+                            {temp.label}
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Status Filter */}
+                  <div className="space-y-2">
+                    <h5 className="font-medium text-[11px] text-muted-foreground uppercase tracking-wider">Status</h5>
+                    <div className="space-y-1">
+                      {selectedStatuses.length > 0 && (
+                        <button 
+                          onClick={() => setSelectedStatuses([])}
+                          className="text-[10px] text-muted-foreground hover:text-primary mb-1"
+                        >
+                          Limpar status
+                        </button>
+                      )}
+                      {CRM_STATUSES.map((status) => (
+                        <div key={status} className="flex items-center space-x-2">
+                          <Checkbox 
+                            id={`filter-${status}`} 
+                            checked={selectedStatuses.includes(status)}
+                            onCheckedChange={() => toggleStatus(status)}
+                          />
+                          <Label 
+                            htmlFor={`filter-${status}`}
+                            className="text-xs font-normal cursor-pointer flex-1"
+                          >
+                            {status}
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </PopoverContent>
@@ -289,16 +396,48 @@ export function CityList({ cities, selectedCityId, onSelectCity }: CityListProps
               Vazio
             </div>
           ) : groupedCities ? (
-            Object.entries(groupedCities).map(([label, items]) => (
-              <div key={label} className="space-y-1.5">
-                <div className="flex items-center gap-2 px-1">
-                  <div className="h-px flex-1 bg-border" />
-                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{label}</span>
-                  <div className="h-px flex-1 bg-border" />
+            (() => {
+              const entries = Object.entries(groupedCities);
+              
+              // Sort entries based on sortBy type
+              const sortedEntries = entries.sort(([a], [b]) => {
+                if (sortBy === 'priority') {
+                  if (a === "Prioridades") return -1;
+                  if (b === "Prioridades") return 1;
+                  return 0;
+                } else if (sortBy === 'status') {
+                  const statusOrder: { [key: string]: number } = {
+                    "Contrato": 0,
+                    "Prefeito": 1,
+                    "Quantitativo": 2,
+                    "Posso": 3,
+                    "Devo": 4,
+                    "Quero": 5
+                  };
+                  return (statusOrder[a] ?? 999) - (statusOrder[b] ?? 999);
+                } else if (sortBy === 'temperature') {
+                  const tempOrder: { [key: string]: number } = {
+                    "Quente": 0,
+                    "Morna": 1,
+                    "Fria": 2,
+                    "Sem temperatura": 3
+                  };
+                  return (tempOrder[a] ?? 999) - (tempOrder[b] ?? 999);
+                }
+                return 0;
+              });
+              
+              return sortedEntries.map(([label, items]) => (
+                <div key={label} className="space-y-1.5">
+                  <div className="flex items-center gap-2 px-1">
+                    <div className="h-px flex-1 bg-border" />
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{label}</span>
+                    <div className="h-px flex-1 bg-border" />
+                  </div>
+                  {items.map(renderCityCard)}
                 </div>
-                {items.map(renderCityCard)}
-              </div>
-            ))
+              ));
+            })()
           ) : (
             <div className="space-y-1.5">
               {sortedAndFiltered.map(renderCityCard)}

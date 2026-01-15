@@ -2,13 +2,28 @@ import * as React from "react";
 import { useLocation } from "wouter";
 import { mockCities, mockSalesReps, City, CRMStatus, Interaction } from "@/lib/mockData";
 import { CityList } from "@/components/dashboard/CityList";
-import { StatusPipeline } from "@/components/dashboard/StatusPipeline";
+import { CRM_STATUSES } from "@/lib/mockData";
 import { Timeline } from "@/components/dashboard/Timeline";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Building2, Calendar, User, MapPin, ArrowLeft, PanelLeft, ChevronLeft, ChevronRight, Thermometer, Info, Star, ChevronDown, ChevronUp, Landmark, GraduationCap, Coins } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
@@ -18,7 +33,6 @@ export default function Dashboard() {
   const [selectedCityId, setSelectedCityId] = React.useState<string | null>(cities[0]?.id || null);
   const [isMobileListView, setIsMobileListView] = React.useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(true);
-  const [isInfoExpanded, setIsInfoExpanded] = React.useState(false);
   const currentUser = mockSalesReps[0]; // Mock logged in user
 
   const selectedCity = React.useMemo(
@@ -89,7 +103,7 @@ export default function Dashboard() {
   return (
     <div className="h-screen w-full flex flex-col bg-background overflow-hidden">
       {/* Header */}
-      <header className="h-12 border-b border-border flex items-center justify-between px-4 bg-card shrink-0 z-10">
+      <header className="relative h-12 border-b border-border flex items-center justify-between px-4 bg-card shrink-0 z-10">
         <div className="flex items-center gap-3">
           {/* Mobile Back Button */}
           {!isMobileListView && (
@@ -112,15 +126,20 @@ export default function Dashboard() {
           >
             <PanelLeft className="h-4 w-4" />
           </Button>
-
-          <div className="flex items-center gap-2">
-            <div className="bg-primary/10 p-1.5 rounded-lg">
-              <Building2 className="h-4 w-4 text-primary" />
-            </div>
-            <div>
-              <h1 className="font-heading font-bold text-base leading-none text-foreground">GovCRM</h1>
-            </div>
+        </div>
+        
+        {/* Centered CONTAGIE Logo and Name */}
+        <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center gap-2">
+          <div className="flex items-center justify-center w-8 h-8 rounded-lg overflow-hidden shrink-0">
+            <img 
+              src="/favicon.png" 
+              alt="CONTAGIE Logo" 
+              className="w-full h-full object-contain"
+            />
           </div>
+          <h1 className="font-heading font-bold text-base leading-none text-foreground">
+            CONTAGIE
+          </h1>
         </div>
         
         <div className="flex items-center gap-3">
@@ -160,135 +179,238 @@ export default function Dashboard() {
             <>
               {/* City Header & Context - Ultra Compact Version */}
               <div className="bg-card border-b border-border shadow-sm z-10 px-4 py-2 md:px-6">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-2">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h2 className="text-lg md:text-xl font-heading font-bold text-foreground tracking-tight truncate flex items-center gap-2">
-                        {selectedCity.name}
-                        <span className="text-sm font-mono text-muted-foreground bg-muted px-1.5 py-0.5 rounded uppercase">{selectedCity.state}</span>
-                      </h2>
+                {/* City Name */}
+                <div className="mb-2 flex items-center gap-2">
+                  <h2 className="text-lg md:text-xl font-heading font-bold text-foreground tracking-tight truncate flex items-center gap-2">
+                    {selectedCity.name}
+                    <span className="text-sm font-mono text-muted-foreground bg-muted px-1.5 py-0.5 rounded uppercase">{selectedCity.state}</span>
+                  </h2>
+                  
+                  {/* Information Panel Trigger */}
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                      >
+                        <Info className="h-4 w-4" />
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+                      <DialogHeader className="pb-4">
+                        <DialogTitle className="text-xl font-heading">Informações Estratégicas</DialogTitle>
+                        <p className="text-sm text-muted-foreground mt-1">{selectedCity.name}, {selectedCity.state}</p>
+                      </DialogHeader>
+                      
+                      <div className="space-y-4">
+                        {/* Liderança Política */}
+                        <Card>
+                          <CardContent className="pt-6">
+                            <div className="flex items-center gap-2 mb-4">
+                              <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-950">
+                                <Landmark className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                              </div>
+                              <h3 className="font-semibold text-sm uppercase tracking-wide text-foreground">Liderança Política</h3>
+                            </div>
+                            <div className="space-y-3 pl-12">
+                              <div>
+                                <p className="text-xs text-muted-foreground mb-1">Prefeito</p>
+                                <p className="text-sm font-medium">{selectedCity.mayor || "João Silva (MDB)"}</p>
+                              </div>
+                              <Separator />
+                              <div>
+                                <p className="text-xs text-muted-foreground mb-1">Vice-Prefeito</p>
+                                <p className="text-sm font-medium">{selectedCity.viceMayor || "Maria Santos (PT)"}</p>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+
+                        {/* Educação */}
+                        <Card>
+                          <CardContent className="pt-6">
+                            <div className="flex items-center gap-2 mb-4">
+                              <div className="p-2 rounded-lg bg-purple-50 dark:bg-purple-950">
+                                <GraduationCap className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                              </div>
+                              <h3 className="font-semibold text-sm uppercase tracking-wide text-foreground">Educação</h3>
+                            </div>
+                            <div className="space-y-3 pl-12">
+                              <div>
+                                <p className="text-xs text-muted-foreground mb-1">Secretário de Educação</p>
+                                <p className="text-sm font-medium">{selectedCity.educationSecretary || "Ana Paula"}</p>
+                              </div>
+                              <Separator />
+                              <div>
+                                <p className="text-xs text-muted-foreground mb-1">Gastos com Educação</p>
+                                <div className="space-y-2">
+                                  <p className="text-lg font-bold text-primary">R$ {selectedCity.educationSpending || "4.2M"}</p>
+                                  <div className="flex items-center gap-2">
+                                    <div className="px-2.5 py-1 rounded-md bg-primary/10 border border-primary/20">
+                                      <span className="text-sm font-bold text-primary">24.5%</span>
+                                    </div>
+                                    <span className="text-xs text-muted-foreground">do orçamento</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+
+                        {/* Status VAAR */}
+                        <Card>
+                          <CardContent className="pt-6">
+                            <div className="flex items-center gap-2 mb-4">
+                              <div className={cn(
+                                "p-2 rounded-lg",
+                                selectedCity.isInVAAR ? "bg-green-50 dark:bg-green-950" : "bg-red-50 dark:bg-red-950"
+                              )}>
+                                <span className="text-lg">🏛️</span>
+                              </div>
+                              <h3 className="font-semibold text-sm uppercase tracking-wide text-foreground">Status VAAR</h3>
+                            </div>
+                            <div className="pl-12 space-y-2">
+                              <div className="flex items-center gap-2">
+                                <div className={cn(
+                                  "w-2 h-2 rounded-full",
+                                  selectedCity.isInVAAR ? "bg-green-500" : "bg-red-500"
+                                )} />
+                                <p className={cn(
+                                  "text-sm font-semibold",
+                                  selectedCity.isInVAAR ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
+                                )}>
+                                  {selectedCity.isInVAAR ? "No VAAR" : "Não está no VAAR"}
+                                </p>
+                              </div>
+                              {!selectedCity.isInVAAR && (
+                                <>
+                                  <Separator className="my-2" />
+                                  <div className="bg-muted/50 rounded-md p-3">
+                                    <p className="text-xs text-muted-foreground mb-1">Motivo</p>
+                                    <p className="text-xs leading-relaxed">Falta condicionalidade III (Gestão Democrática)</p>
+                                  </div>
+                                </>
+                              )}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+
+                {/* Controls Row: Prioridade, Temperature, Status Phase */}
+                <div className="flex items-center gap-2 flex-wrap">
+                  {/* Prioridade Button */}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      "h-7 px-2 rounded-full transition-all text-[10px] font-bold uppercase tracking-wider gap-1.5",
+                      selectedCity.isPriority 
+                        ? "text-yellow-600 bg-yellow-50 border border-yellow-200 hover:bg-yellow-100 shadow-sm" 
+                        : "text-muted-foreground hover:text-yellow-600 hover:bg-yellow-50/50"
+                    )}
+                    onClick={handleTogglePriority}
+                    data-testid="btn-toggle-priority"
+                  >
+                    <Star className={cn("h-3 w-3", selectedCity.isPriority && "fill-current")} />
+                    Prioridade
+                  </Button>
+                  
+                  {/* Temperature Control Dropdown */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
                       <Button
                         variant="ghost"
                         size="sm"
                         className={cn(
-                          "h-7 px-2 rounded-full transition-all text-[10px] font-bold uppercase tracking-wider gap-1.5",
-                          selectedCity.isPriority 
-                            ? "text-yellow-600 bg-yellow-50 border border-yellow-200 hover:bg-yellow-100 shadow-sm" 
-                            : "text-muted-foreground hover:text-yellow-600 hover:bg-yellow-50/50"
+                          "h-7 px-2 rounded-full transition-all text-[10px] font-medium gap-1.5",
+                          selectedCity.temperature === 'cold' 
+                            ? "text-blue-600 bg-blue-50 border border-blue-200 hover:bg-blue-100" 
+                            : selectedCity.temperature === 'warm'
+                            ? "text-orange-600 bg-orange-50 border border-orange-200 hover:bg-orange-100"
+                            : selectedCity.temperature === 'hot'
+                            ? "text-red-600 bg-red-50 border border-red-200 hover:bg-red-100"
+                            : "text-muted-foreground border border-border hover:bg-secondary/50"
                         )}
-                        onClick={handleTogglePriority}
-                        data-testid="btn-toggle-priority"
                       >
-                        <Star className={cn("h-3 w-3", selectedCity.isPriority && "fill-current")} />
-                        Prioridade na visita
+                        {selectedCity.temperature === 'cold' && <span>❄️</span>}
+                        {selectedCity.temperature === 'warm' && <span>🌤️</span>}
+                        {selectedCity.temperature === 'hot' && <span>🔥</span>}
+                        {selectedCity.temperature === 'cold' && 'Fria'}
+                        {selectedCity.temperature === 'warm' && 'Morna'}
+                        {selectedCity.temperature === 'hot' && 'Quente'}
+                        {!selectedCity.temperature && 'Temperatura'}
+                        <ChevronDown className="h-3 w-3 opacity-50" />
                       </Button>
-                    </div>
-                  </div>
-                  
-                  {/* Temperature Control */}
-                  <div className="flex items-center bg-secondary/30 p-1 rounded-lg border border-border/50">
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <div className="flex items-center gap-1 px-1 mr-1 text-muted-foreground">
-                            <Thermometer className="w-3 h-3" />
-                            <Info className="w-2.5 h-2.5 opacity-50" />
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p className="text-xs">Classificação de temperatura comercial</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                    <div className="flex gap-0.5">
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-40">
                       {[
-                        { id: 'cold', label: '❄️ Fria', color: 'text-blue-600 bg-blue-50 border-blue-100' },
-                        { id: 'warm', label: '🌤️ Morna', color: 'text-orange-600 bg-orange-50 border-orange-100' },
-                        { id: 'hot', label: '🔥 Quente', color: 'text-red-600 bg-red-50 border-red-100' }
+                        { id: 'cold', label: 'Fria', icon: '❄️' },
+                        { id: 'warm', label: 'Morna', icon: '🌤️' },
+                        { id: 'hot', label: 'Quente', icon: '🔥' }
                       ].map((t) => (
-                        <button
+                        <DropdownMenuItem
                           key={t.id}
                           onClick={() => handleTemperatureChange(t.id as any)}
                           className={cn(
-                            "px-2 py-0.5 rounded text-[10px] font-bold transition-all border border-transparent",
-                            selectedCity.temperature === t.id 
-                              ? t.color + " border-current shadow-sm" 
-                              : "text-muted-foreground hover:bg-secondary/50"
+                            "text-xs cursor-pointer",
+                            selectedCity.temperature === t.id && "bg-secondary"
                           )}
                         >
+                          <span className="mr-2">{t.icon}</span>
                           {t.label}
-                        </button>
+                        </DropdownMenuItem>
                       ))}
-                    </div>
-                  </div>
-                </div>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
 
-                {/* Pipeline Visualizer */}
-                <div className="w-full -mt-1">
-                  <StatusPipeline 
-                    currentStatus={selectedCity.currentStatus} 
-                    onStatusChange={handleStatusChange}
-                  />
-                </div>
-
-                {/* Strategic Info Collapsible */}
-                <Collapsible
-                  open={isInfoExpanded}
-                  onOpenChange={setIsInfoExpanded}
-                  className="mt-2 border-t border-border/40 pt-2"
-                >
-                  <CollapsibleTrigger asChild>
-                    <Button variant="ghost" className="w-full h-7 flex items-center justify-between px-2 hover:bg-secondary/30 text-muted-foreground group">
-                      <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider">
-                        <Info className="w-3 h-3" />
-                        Informações Estratégicas
-                      </div>
-                      {isInfoExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-                    </Button>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="mt-2 space-y-3 pb-2 animate-in fade-in slide-in-from-top-1 duration-200">
-                    <div className="grid grid-cols-2 gap-4 px-2">
-                      <div className="space-y-2">
-                        <div className="flex flex-col">
-                          <span className="text-[10px] text-muted-foreground flex items-center gap-1 uppercase font-bold tracking-tighter">
-                            <Landmark className="w-3 h-3" /> Liderança Política
-                          </span>
-                          <span className="text-xs font-medium">Prefeito: {selectedCity.mayor || "João Silva (MDB)"}</span>
-                          <span className="text-[10px] text-muted-foreground">Vice: {selectedCity.viceMayor || "Maria Santos (PT)"}</span>
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="text-[10px] text-muted-foreground flex items-center gap-1 uppercase font-bold tracking-tighter">
-                            <GraduationCap className="w-3 h-3" /> Educação
-                          </span>
-                          <span className="text-xs font-medium">Sec. Educação: {selectedCity.educationSecretary || "Ana Paula"}</span>
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <div className="flex flex-col">
-                          <span className="text-[10px] text-muted-foreground flex items-center gap-1 uppercase font-bold tracking-tighter">
-                            <Coins className="w-3 h-3" /> Gastos Educação
-                          </span>
-                          <span className="text-xs font-bold text-primary">R$ {selectedCity.educationSpending || "4.2M"}</span>
-                          <span className="text-[10px] text-muted-foreground">24.5% do orçamento</span>
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="text-[10px] text-muted-foreground flex items-center gap-1 uppercase font-bold tracking-tighter">
-                            🏛️ Status VAAR
-                          </span>
-                          <span className={cn(
-                            "text-xs font-bold",
-                            selectedCity.isInVAAR ? "text-green-600" : "text-red-600"
-                          )}>
-                            {selectedCity.isInVAAR ? "No VAAR" : "Não está no VAAR"}
-                          </span>
-                          {!selectedCity.isInVAAR && (
-                            <span className="text-[10px] text-muted-foreground leading-tight">Motivo: Falta condicionalidade III (Gestão Democrática)</span>
+                  {/* Status Phase Dropdown */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className={cn(
+                          "h-7 px-2 rounded-full transition-all text-[10px] font-medium gap-1.5 border",
+                          selectedCity.currentStatus === 'Quero' 
+                            ? "bg-slate-100 text-slate-700 border-slate-200" 
+                            : selectedCity.currentStatus === 'Devo'
+                            ? "bg-slate-200 text-slate-700 border-slate-300"
+                            : selectedCity.currentStatus === 'Posso'
+                            ? "bg-yellow-100 text-yellow-700 border-yellow-200"
+                            : selectedCity.currentStatus === 'Quantitativo'
+                            ? "bg-orange-100 text-orange-700 border-orange-200"
+                            : selectedCity.currentStatus === 'Prefeito'
+                            ? "bg-purple-100 text-purple-700 border-purple-200"
+                            : selectedCity.currentStatus === 'Contrato'
+                            ? "bg-green-100 text-green-700 border-green-200"
+                            : "text-muted-foreground border-border hover:bg-secondary/50"
+                        )}
+                      >
+                        {selectedCity.currentStatus}
+                        <ChevronDown className="h-3 w-3 opacity-50" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-48">
+                      {CRM_STATUSES.map((status) => (
+                        <DropdownMenuItem
+                          key={status}
+                          onClick={() => handleStatusChange(status)}
+                          className={cn(
+                            "text-xs cursor-pointer",
+                            selectedCity.currentStatus === status && "bg-secondary"
                           )}
-                        </div>
-                      </div>
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
+                        >
+                          {status}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+
               </div>
 
               {/* Timeline & Interactions */}
