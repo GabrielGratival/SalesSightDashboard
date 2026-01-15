@@ -4,7 +4,6 @@ import { mockCities, mockSalesReps, City, CRMStatus, Interaction } from "@/lib/m
 import { CityList } from "@/components/dashboard/CityList";
 import { CRM_STATUSES } from "@/lib/mockData";
 import { Timeline } from "@/components/dashboard/Timeline";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Building2, Calendar, User, MapPin, ArrowLeft, PanelLeft, ChevronLeft, ChevronRight, Thermometer, Info, Star, ChevronDown, ChevronUp, Landmark, GraduationCap, Coins } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -142,15 +141,6 @@ export default function Dashboard() {
           </h1>
         </div>
         
-        <div className="flex items-center gap-3">
-          <div className="text-right hidden md:block">
-            <p className="text-xs font-medium">{currentUser.name}</p>
-          </div>
-          <Avatar className="h-7 w-7 ring-2 ring-background shadow-sm">
-            <AvatarImage src={currentUser.avatar} />
-            <AvatarFallback>CS</AvatarFallback>
-          </Avatar>
-        </div>
       </header>
 
       {/* Main Content */}
